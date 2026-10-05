@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Penyimpanan</title>
+<style>
+:root{--bg:#0d1117;--bg2:#151b24;--ln:#243040;--tx:#e9eef4;--mut:#8b9bad;--ac:#3ec6a8;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Segoe UI",Roboto,sans-serif}
+.w{max-width:900px;margin:0 auto;padding:20px}
+h1{font-size:1.3rem;margin:0 0 16px}h2{font-size:1rem;margin:24px 0 10px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tabs button,.btn{border:1px solid var(--ln);background:var(--bg2);color:var(--tx);padding:9px 16px;border-radius:99px;font:inherit;cursor:pointer;transition:all .2s}
+.tabs button.on,.btn.p{background:var(--ac);color:#06201a;border-color:var(--ac);font-weight:600}
+.btn:hover,.tabs button:hover{transform:translateY(-2px)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.box{background:var(--bg2);border:1px solid var(--ln);border-radius:var(--r);padding:16px;margin-bottom:16px}
+input,select{width:100%;padding:10px;margin-bottom:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;font:inherit}
+.row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ln);animation:in .4s both}
+.row img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#1d3b4a}
+.row div{flex:1;min-width:0}.row small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x{color:#ff7a7a}
+.hide{display:none}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div class="w">
+<h1>Penyimpanan</h1>
+<div class="tabs"><button class="on" data-t="v">Video</button><button data-t="a">Iklan</button><button data-t="s">Pengaturan</button></div>
+
+<section id="v"><div class="box">
+ <input id="vt" placeholder="Judul video"><input id="vu" placeholder="URL video (.mp4 atau link embed)">
+ <input id="vi" placeholder="Nama gambar di folder img, contoh: film1.jpg"><input id="vd" placeholder="Deskripsi (opsional)">
+ <button class="btn p" id="addV">Tambah video</button></div><div id="lv"></div></section>
+
+<section id="a" class="hide"><div class="box">
+ <select id="as"><option value="below">Di bawah player</option><option value="side">Sidebar</option></select>
+ <input id="ai" placeholder="Gambar iklan di folder img, contoh: iklan1.jpg"><input id="al" placeholder="Link tujuan iklan (https://...)">
+ <input id="at" placeholder="Teks iklan"><button class="btn p" id="addA">Tambah iklan</button></div><div id="la"></div></section>
+
+<section id="s" class="hide"><div class="box">
+ <input id="sn" placeholder="Nama web"><input id="st" placeholder="Username Telegram (tanpa @)"></div></section>
+
+<h2>Simpan</h2>
+<button class="btn p" id="dl">Unduh data.json</button>
+<p style="color:var(--mut);font-size:.88rem">Ganti file data.json di repo GitHub dengan hasil unduhan, lalu web penonton ikut berubah.</p>
+</div>
+<script>
+function $(i){return document.getElementById(i)}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+var D={site:"Nonton",telegram:"",videos:[],ads:[]};
+fetch("data.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){D=j}).catch(function(){}).then(draw);
+
+function row(img,t,s,del){
+ var r=el("div","row"),i=el("img");i.alt="";i.src="img/"+img;i.onerror=function(){i.removeAttribute("src")};
+ var d=el("div");d.appendChild(el("b","",t));d.appendChild(el("small","",s));
+ var b=el("button","btn x","Hapus");b.onclick=del;r.append(i,d,b);return r;
+}
+function draw(){
+ $("sn").value=D.site||"";$("st").value=D.telegram||"";
+ var lv=$("lv"),la=$("la");lv.textContent="";la.textContent="";
+ D.videos.forEach(function(v,n){lv.appendChild(row(v.img,v.title,v.url,function(){D.videos.splice(n,1);draw()}))});
+ D.ads.forEach(function(a,n){la.appendChild(row(a.img,a.text||"Iklan",a.slot+" · "+a.link,function(){D.ads.splice(n,1);draw()}))});
+ if(!D.videos.length)lv.textContent="Belum ada video.";
+ if(!D.ads.length)la.textContent="Belum ada iklan.";
+}
+$("addV").onclick=function(){
+ if(!$("vt").value.trim()||!$("vu").value.trim())return;
+ D.videos.push({title:$("vt").value.trim(),url:$("vu").value.trim(),img:$("vi").value.trim(),desc:$("vd").value.trim()});
+ ["vt","vu","vi","vd"].forEach(function(i){$(i).value=""});draw();
+};
+$("addA").onclick=function(){
+ if(!$("al").value.trim())return;
+ D.ads.push({slot:$("as").value,img:$("ai").value.trim(),link:$("al").value.trim(),text:$("at").value.trim()});
+ ["ai","al","at"].forEach(function(i){$(i).value=""});draw();
+};
+document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){
+ document.querySelectorAll(".tabs button").forEach(function(x){x.classList.toggle("on",x===b)});
+ ["v","a","s"].forEach(function(k){$(k).classList.toggle("hide",k!==b.dataset.t)});
+}});
+$("dl").onclick=function(){
+ D.site=$("sn").value.trim()||"Nonton";D.telegram=$("st").value.trim().replace("@","");
+ var u=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:"application/json"}));
+ var a=el("a");a.href=u;a.download="data.json";a.click();URL.revokeObjectURL(u);
+};
+</script></body></html>
