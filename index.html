@@ -1,157 +1,220 @@
-<!DOCTYPE html>
-<html lang="id"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark">
-<title>Penyimpanan</title>
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0e1013">
+<title>Notes</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <style>
-:root{--bg:#0d1117;--bg2:#151b24;--ln:#243040;--tx:#e9eef4;--mut:#8b9bad;--ac:#3ec6a8;--r:12px}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:"Segoe UI",Roboto,sans-serif}
-.w{max-width:900px;margin:0 auto;padding:20px}
-h1{font-size:1.3rem;margin:0 0 16px}
-.tabs{display:flex;gap:8px;margin-bottom:16px}
-.tabs button,.btn{border:1px solid var(--ln);background:var(--bg2);color:var(--tx);padding:9px 16px;border-radius:99px;font:inherit;cursor:pointer;transition:all .2s}
-.tabs button.on,.btn.p{background:var(--ac);color:#06201a;border-color:var(--ac);font-weight:600}
-.btn:hover,.tabs button:hover{transform:translateY(-2px)}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
-.box{background:var(--bg2);border:1px solid var(--ln);border-radius:var(--r);padding:16px;margin-bottom:16px}
-label{display:block;color:var(--mut);font-size:.85rem;margin:4px 0}
-input,select{width:100%;padding:10px;margin-bottom:8px;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:8px;font:inherit}
-.row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ln);animation:in .4s both}
-.row img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#1d3b4a}
-.row div{flex:1;min-width:0}.row small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.x{color:#ff7a7a}.hide{display:none}
-#st{position:sticky;bottom:12px;background:var(--bg2);border:1px solid var(--ac);border-radius:var(--r);padding:10px 14px;margin-top:12px;transition:opacity .3s}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><div class="w">
-<h1>Penyimpanan</h1>
-<div class="tabs"><button class="on" data-t="v">Video</button><button data-t="a">Iklan</button><button data-t="s">Pengaturan</button></div>
+:root{--bg:#0e1013;--s1:#161a1f;--s2:#1f242b;--tx:#dde1e7;--mu:#7d8692;--ac:#8fd3c3;--ac2:#1c3a35;--danger:#e0766b;--r:16px;
+--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+.hide{display:none!important}
+/* lock */
+#lock{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:50;padding:24px;text-align:center}
+#lock .nf h1{font-size:88px;font-weight:200;letter-spacing:-4px;color:#2b3038;user-select:none;padding:8px 24px}
+#lock .nf p{color:#454c56;margin-top:4px}
+#lock form{display:flex;flex-direction:column;gap:12px;width:min(300px,86vw);animation:rise .35s cubic-bezier(.2,.8,.2,1)}
+#lock input{background:var(--s1);border:1px solid var(--s2);border-radius:12px;padding:14px 16px;text-align:center;outline:none;letter-spacing:2px}
+#lock input:focus{border-color:var(--ac)}
+#lock small{color:var(--mu);min-height:1.2em}
+#lock .go{background:var(--ac);color:#0a1411;border-radius:12px;padding:13px;font-weight:600}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+/* app */
+header{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 70%,transparent);padding:calc(var(--safe-t) + 14px) 16px 10px}
+.top{display:flex;align-items:baseline;justify-content:space-between}
+.top b{font-size:22px;font-weight:600;letter-spacing:-.4px}
+.top span{color:var(--mu);font-size:13px}
+.tabs{display:flex;gap:6px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+.tabs button{padding:7px 15px;border-radius:99px;background:var(--s1);color:var(--mu);white-space:nowrap;transition:background .2s,color .2s}
+.tabs button.on{background:var(--ac2);color:var(--ac)}
+main{padding:6px 14px calc(110px + var(--safe-b))}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{position:relative;border-radius:var(--r);overflow:hidden;background:var(--s1);aspect-ratio:3/4;text-align:left;content-visibility:auto;contain-intrinsic-size:200px 266px;transition:transform .18s}
+.card:active{transform:scale(.97)}
+.card img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .35s}
+.card img.ld{opacity:1}
+.card .ph{position:absolute;inset:0;display:grid;place-items:center;color:#3a424c;font-size:34px}
+.card .cap{position:absolute;left:0;right:0;bottom:0;padding:28px 10px 9px;background:linear-gradient(transparent,rgba(8,10,12,.88));font-size:13px;line-height:1.25;display:flex;justify-content:space-between;gap:6px;align-items:flex-end}
+.card .cap i{font-style:normal;color:var(--ac);font-size:11px;flex:none}
+.card .cap em{font-style:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.empty{text-align:center;color:var(--mu);padding:90px 20px}
+.empty b{display:block;color:var(--tx);font-size:17px;margin-bottom:6px;font-weight:600}
+#add{position:fixed;right:18px;bottom:calc(20px + var(--safe-b));width:58px;height:58px;border-radius:20px;background:var(--ac);color:#0a1411;font-size:30px;font-weight:300;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:6;transition:transform .2s}
+#add:active{transform:scale(.92)}
+#lockbtn{color:var(--mu);padding:4px 0 4px 14px;font-size:13px}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-b));transform:translate(-50%,20px);background:var(--s2);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:70;font-size:13px;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* viewer */
+#view{position:fixed;inset:0;background:#07080a;z-index:30;display:flex;flex-direction:column;animation:fade .22s}
+@keyframes fade{from{opacity:0}}
+#vbar{display:flex;align-items:center;gap:6px;padding:calc(var(--safe-t) + 8px) 10px 8px;background:rgba(14,16,19,.92);z-index:2}
+#vbar h2{flex:1;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 6px}
+#vbar button{padding:8px 12px;border-radius:10px;color:var(--mu);font-size:13px}
+#vbar .x{color:var(--tx);font-size:20px}
+#vbar .del{color:var(--danger)}
+#vbody{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;-webkit-overflow-scrolling:touch}
+#vbody.center{align-items:center}
+#vbody img,#vbody video{max-width:100%;max-height:100%;display:block}
+#pages{width:min(100%,900px)}
+#pages .pg{position:relative;background:#14171b;margin:0 auto}
+#pages canvas{width:100%;height:100%;display:block}
+.bar{position:fixed;left:0;right:0;top:0;height:2px;background:var(--ac);transform-origin:left;transform:scaleX(0);z-index:80;transition:transform .2s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="bar" id="bar"></div>
 
-<section id="v"><div class="box">
- <label>Judul</label><input id="vt">
- <label>URL video (.mp4 atau link YouTube / embed)</label><input id="vu">
- <label>Deskripsi (opsional)</label><input id="vd">
- <label>Thumbnail (opsional, kosongkan = otomatis)</label><input id="vf" type="file" accept="image/*">
- <button class="btn p" id="addV">Upload video</button></div><div id="lv"></div></section>
-
-<section id="a" class="hide"><div class="box">
- <label>Posisi</label><select id="as"><option value="below">Di bawah player</option><option value="side">Sidebar</option></select>
- <label>Gambar iklan</label><input id="af" type="file" accept="image/*">
- <label>Link tujuan (https://...)</label><input id="al">
- <label>Teks iklan</label><input id="at">
- <button class="btn p" id="addA">Upload iklan</button></div><div id="la"></div></section>
-
-<section id="s" class="hide"><div class="box">
- <label>Username GitHub</label><input id="co">
- <label>Nama repo penyimpanan</label><input id="cr" value="streaming-storage">
- <label>Branch</label><input id="cb" value="main">
- <label>Token GitHub (fine-grained, izin Contents: Read and write, hanya untuk repo ini)</label><input id="ct" type="password">
- <label>Nama web</label><input id="sn">
- <label>Username Telegram (tanpa @)</label><input id="sg">
- <button class="btn p" id="sv">Simpan pengaturan</button></div></section>
-<div id="st">Siap.</div>
+<div id="lock">
+  <div class="nf" id="nf"><h1 id="n404">404</h1><p>Halaman tidak ditemukan.</p></div>
+  <form id="lf" class="hide" autocomplete="off">
+    <small id="lmsg"></small>
+    <input id="pw" type="password" placeholder="kata sandi" autocomplete="off">
+    <input id="pw2" type="password" placeholder="ulangi kata sandi" class="hide" autocomplete="off">
+    <button class="go" id="lgo">Buka</button>
+  </form>
 </div>
+
+<div id="app" class="hide">
+  <header>
+    <div class="top"><b id="ttl">Koleksi</b><div><span id="cnt"></span><button id="lockbtn">Kunci</button></div></div>
+    <div class="tabs" id="tabs">
+      <button data-t="all" class="on">Semua</button><button data-t="image">Foto</button><button data-t="video">Video</button><button data-t="pdf">Komik</button>
+    </div>
+  </header>
+  <main><div class="grid" id="grid"></div><div class="empty hide" id="empty"><b>Masih kosong</b>Tekan + untuk menambah foto, video, atau PDF komik.</div></main>
+  <button id="add" aria-label="Tambah">+</button>
+  <input id="file" type="file" multiple accept="image/*,video/*,application/pdf,.pdf" class="hide">
+</div>
+
+<div id="view" class="hide">
+  <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vr">Ubah judul</button><button class="del" id="vd">Hapus</button></div>
+  <div id="vbody"></div>
+</div>
+<div id="toast"></div>
+
 <script>
-function $(i){return document.getElementById(i)}
-function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
-var C=JSON.parse(localStorage.getItem("cfg")||"{}");
-var D={site:"Nonton",telegram:"",videos:[],ads:[]},SHA=null;
-function say(m){$("st").textContent=m}
-function raw(n){return !n?"":/^https?:/.test(n)?n:"https://raw.githubusercontent.com/"+C.owner+"/"+C.repo+"/"+C.branch+"/img/"+n}
+'use strict';
+const $=s=>document.querySelector(s), CH=2*1024*1024, PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+const te=new TextEncoder(), td=new TextDecoder();
+let KEY=null, items=[], tab='all', urls=[], curUrl=null, hideTimer=null;
 
-function api(path,opt){
- opt=opt||{};opt.headers={Accept:"application/vnd.github+json",Authorization:"Bearer "+C.token};
- opt.cache="no-store";
- return fetch("https://api.github.com/repos/"+C.owner+"/"+C.repo+"/contents/"+path,opt);
-}
-function b64(str){return btoa(unescape(encodeURIComponent(str)))}
-function load(){
- if(!C.token){say("Isi dulu tab Pengaturan.");tab("s");return Promise.resolve()}
- say("Memuat data dari GitHub...");
- return api("data.json?ref="+C.branch).then(function(r){
-  if(r.status===404){D={site:"Nonton",telegram:"",videos:[],ads:[]};SHA=null;return}
-  if(!r.ok)throw new Error("Gagal memuat ("+r.status+"). Cek token dan nama repo.");
-  return r.json().then(function(j){SHA=j.sha;D=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,"")))))});
- }).then(function(){draw();say("Data dimuat.")}).catch(function(e){say(e.message)});
-}
-function save(msg){
- var body={message:msg,content:b64(JSON.stringify(D,null,1)),branch:C.branch};if(SHA)body.sha=SHA;
- return api("data.json",{method:"PUT",body:JSON.stringify(body)}).then(function(r){
-  if(!r.ok)throw new Error("Gagal menyimpan ("+r.status+"). Muat ulang halaman lalu coba lagi.");
-  return r.json()}).then(function(j){SHA=j.content.sha;draw()});
-}
-function putImg(name,data){
- return api("img/"+name,{method:"PUT",body:JSON.stringify({message:"upload "+name,content:data,branch:C.branch})})
- .then(function(r){if(!r.ok)throw new Error("Gagal upload gambar ("+r.status+")");return name});
-}
-function toJpg(src,w,h){
- var s=Math.min(1,640/w),c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
- c.getContext("2d").drawImage(src,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.82).split(",")[1];
-}
-function fromFile(f){return new Promise(function(res,rej){
- var i=new Image();i.onload=function(){res(toJpg(i,i.naturalWidth,i.naturalHeight))};i.onerror=rej;i.src=URL.createObjectURL(f);
-})}
-function fromVideo(u){return new Promise(function(res,rej){
- var v=document.createElement("video");v.crossOrigin="anonymous";v.muted=true;v.preload="metadata";v.src=u;
- v.onloadedmetadata=function(){v.currentTime=Math.min(2,v.duration/2)};
- v.onseeked=function(){try{res(toJpg(v,v.videoWidth,v.videoHeight))}catch(e){rej(e)}};
- v.onerror=rej;setTimeout(rej,15000);
-})}
-function ytId(u){var m=u.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);return m&&m[1]}
-function uid(){return Date.now().toString(36)}
+/* ---------- storage (IndexedDB, tidak muncul di galeri / file manager) ---------- */
+const dbp=new Promise((res,rej)=>{const r=indexedDB.open('cache-v2',1);
+  r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('cfg',{keyPath:'k'});d.createObjectStore('meta',{keyPath:'id'});d.createObjectStore('data',{keyPath:'id'})};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function tx(store,mode,fn){const d=await dbp;return new Promise((res,rej)=>{const t=d.transaction(store,mode),s=t.objectStore(store),q=fn(s);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
+const put=(s,v)=>tx(s,'readwrite',x=>x.put(v)), get=(s,k)=>tx(s,'readonly',x=>x.get(k)), all=s=>tx(s,'readonly',x=>x.getAll()), del=(s,k)=>tx(s,'readwrite',x=>x.delete(k));
 
-/* thumbnail otomatis: file pilihan > YouTube > frame video mp4 > kosong */
-function makeThumb(file,url){
- if(file)return fromFile(file).then(function(d){return putImg("v"+uid()+".jpg",d)});
- var y=ytId(url);if(y)return Promise.resolve("https://img.youtube.com/vi/"+y+"/hqdefault.jpg");
- if(/\.(mp4|webm)(\?|$)/i.test(url))return fromVideo(url).then(function(d){return putImg("v"+uid()+".jpg",d)}).catch(function(){return ""});
- return Promise.resolve("");
-}
-$("addV").onclick=function(){
- var t=$("vt").value.trim(),u=$("vu").value.trim();
- if(!t||!/^https?:\/\//.test(u)){say("Isi judul dan URL video (https://...).");return}
- var y=ytId(u);if(y)u="https://www.youtube.com/embed/"+y;
- say("Mengupload...");
- makeThumb($("vf").files[0],u).then(function(img){
-  D.videos.unshift({title:t,url:u,img:img,desc:$("vd").value.trim()});
-  return save("tambah video: "+t);
- }).then(function(){["vt","vu","vd","vf"].forEach(function(i){$(i).value=""});say("Berhasil. Muncul di web penonton dalam beberapa menit.")})
- .catch(function(e){say(e.message||"Gagal.")});
-};
-$("addA").onclick=function(){
- var f=$("af").files[0],l=$("al").value.trim();
- if(!f||!/^https?:\/\//.test(l)){say("Pilih gambar dan isi link (https://...).");return}
- say("Mengupload...");
- fromFile(f).then(function(d){return putImg("a"+uid()+".jpg",d)}).then(function(n){
-  D.ads.push({slot:$("as").value,img:n,link:l,text:$("at").value.trim()});return save("tambah iklan");
- }).then(function(){["af","al","at"].forEach(function(i){$(i).value=""});say("Iklan tersimpan.")})
- .catch(function(e){say(e.message||"Gagal.")});
-};
-function row(img,t,s,del){
- var r=el("div","row"),i=el("img");i.alt="";i.src=raw(img);i.onerror=function(){i.removeAttribute("src")};
- var d=el("div");d.appendChild(el("b","",t));d.appendChild(el("small","",s));
- var b=el("button","btn x","Hapus");b.onclick=del;r.append(i,d,b);return r;
-}
-function draw(){
- $("sn").value=D.site||"";$("sg").value=D.telegram||"";
- var lv=$("lv"),la=$("la");lv.textContent="";la.textContent="";
- D.videos.forEach(function(v,n){lv.appendChild(row(v.img,v.title,v.url,function(){D.videos.splice(n,1);save("hapus video").then(function(){say("Dihapus.")}).catch(function(e){say(e.message)})}))});
- D.ads.forEach(function(a,n){la.appendChild(row(a.img,a.text||"Iklan",a.slot+" · "+a.link,function(){D.ads.splice(n,1);save("hapus iklan").then(function(){say("Dihapus.")}).catch(function(e){say(e.message)})}))});
- if(!D.videos.length)lv.textContent="Belum ada video.";
- if(!D.ads.length)la.textContent="Belum ada iklan.";
-}
-$("sv").onclick=function(){
- C={owner:$("co").value.trim(),repo:$("cr").value.trim(),branch:$("cb").value.trim()||"main",token:$("ct").value.trim()};
- localStorage.setItem("cfg",JSON.stringify(C));
- load().then(function(){D.site=$("sn").value.trim()||"Nonton";D.telegram=$("sg").value.trim().replace("@","");return save("pengaturan")})
- .then(function(){say("Pengaturan tersimpan.")}).catch(function(e){say(e.message)});
-};
-function tab(k){
- document.querySelectorAll(".tabs button").forEach(function(x){x.classList.toggle("on",x.dataset.t===k)});
- ["v","a","s"].forEach(function(i){$(i).classList.toggle("hide",i!==k)});
-}
-document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){tab(b.dataset.t)}});
-$("co").value=C.owner||"";$("cr").value=C.repo||"streaming-storage";$("cb").value=C.branch||"main";$("ct").value=C.token||"";
-draw();load();
+/* ---------- crypto: AES-GCM 256, kunci dari kata sandi (PBKDF2) ---------- */
+async function derive(pw,salt){const m=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function seal(buf){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},KEY,buf);
+  const o=new Uint8Array(12+ct.byteLength);o.set(iv);o.set(new Uint8Array(ct),12);return o.buffer}
+async function unseal(buf){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},KEY,u.slice(12))}
+const sealJSON=o=>seal(te.encode(JSON.stringify(o))), unsealJSON=async b=>JSON.parse(td.decode(await unseal(b)));
+
+/* ---------- util ---------- */
+function toast(t,ms=2200){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),ms)}
+const clean=n=>n.replace(/\.[^.]+$/,'').replace(/[_\-.]+/g,' ').replace(/\s+/g,' ').trim()||'Tanpa judul';
+const uid=()=>Date.now().toString(36)+crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+const kind=f=>f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':(f.type==='application/pdf'||/\.pdf$/i.test(f.name))?'pdf':null;
+const canvasBlob=c=>new Promise(r=>c.toBlob(r,'image/jpeg',.72));
+const once=(el,ev)=>new Promise(r=>el.addEventListener(ev,r,{once:true}));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve();return new Promise((res,rej)=>{const s=document.createElement('script');s.src=PDFJS+'pdf.min.js';
+  s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';res()};s.onerror=()=>rej(new Error('pdf.js belum ter-cache, buka sekali saat online'));document.head.appendChild(s)})}
+function drawThumb(src,w,h){const c=document.createElement('canvas'),W=420,sc=W/w;c.width=W;c.height=Math.round(h*sc);c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c}
+
+/* ---------- thumbnails (hanya sampul / frame pertama) ---------- */
+async function thumbImage(f){try{const b=await createImageBitmap(f);const c=drawThumb(b,b.width,b.height);b.close();return {blob:await canvasBlob(c)}}catch{return {}}}
+async function thumbVideo(f){const u=URL.createObjectURL(f),v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='metadata';v.src=u;
+  try{await Promise.race([once(v,'loadeddata'),sleep(8000).then(()=>{throw 0})]);v.currentTime=Math.min(1,(v.duration||2)/10);
+    await Promise.race([once(v,'seeked'),sleep(4000)]);const c=drawThumb(v,v.videoWidth,v.videoHeight);return {blob:await canvasBlob(c)}}
+  catch{return {}}finally{URL.revokeObjectURL(u);v.removeAttribute('src');v.load()}}
+async function thumbPdf(f){await loadPdfJs();const doc=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+  let title=null;try{const m=await doc.getMetadata();title=(m.info&&m.info.Title||'').trim()}catch{}
+  const p=await doc.getPage(1),vp=p.getViewport({scale:1}),sc=420/vp.width,v2=p.getViewport({scale:sc}),c=document.createElement('canvas');
+  c.width=v2.width;c.height=v2.height;await p.render({canvasContext:c.getContext('2d'),viewport:v2}).promise;
+  const n=doc.numPages;doc.destroy();return {blob:await canvasBlob(c),title:title&&title.length>2?title:null,pages:n}}
+
+/* ---------- tambah file ---------- */
+async function addFiles(list){const files=[...list];let i=0,fail=0;
+  for(const f of files){i++;const k=kind(f);if(!k){fail++;continue}
+    try{toast(`Mengunci ${i}/${files.length}…`,60000);$('#bar').style.transform=`scaleX(${(i-1)/files.length})`;
+      const id=uid(),t=k==='image'?await thumbImage(f):k==='video'?await thumbVideo(f):await thumbPdf(f);
+      const chunks=[];for(let o=0;o<f.size;o+=CH)chunks.push(await seal(await f.slice(o,o+CH).arrayBuffer()));
+      const meta={title:t.title||clean(f.name),type:k,mime:f.type||'application/pdf',size:f.size,added:Date.now(),pages:t.pages||0};
+      await put('data',{id,chunks});
+      await put('meta',{id,m:await sealJSON(meta),th:t.blob?await seal(await t.blob.arrayBuffer()):null});
+    }catch(e){fail++;console.error(e)}}
+  $('#bar').style.transform='scaleX(1)';setTimeout(()=>$('#bar').style.transform='scaleX(0)',400);
+  toast(fail?`Selesai, ${fail} gagal`:'Tersimpan & terkunci. Hapus file asli dari galeri HP.',3600);await load()}
+
+/* ---------- daftar ---------- */
+async function load(){urls.forEach(URL.revokeObjectURL);urls=[];const rows=await all('meta');items=[];
+  for(const r of rows){try{const m=await unsealJSON(r.m);let th=null;if(r.th){th=URL.createObjectURL(new Blob([await unseal(r.th)],{type:'image/jpeg'}));urls.push(th)}items.push({id:r.id,...m,th})}catch{}}
+  items.sort((a,b)=>b.added-a.added);render()}
+const ICON={image:'▣',video:'▶',pdf:'❏'}, TAG={image:'foto',video:'video',pdf:'komik'};
+function render(){const g=$('#grid'),list=items.filter(x=>tab==='all'||x.type===tab);g.textContent='';
+  $('#empty').classList.toggle('hide',list.length>0);$('#cnt').textContent=items.length?items.length+' item':'';
+  const fr=document.createDocumentFragment();
+  for(const it of list){const b=document.createElement('button');b.className='card';
+    b.innerHTML=`<div class="ph">${ICON[it.type]}</div>${it.th?'<img alt="" decoding="async" loading="lazy">':''}<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`;
+    b.querySelector('em').textContent=it.title;
+    const im=b.querySelector('img');if(im){im.src=it.th;im.onload=()=>im.classList.add('ld')}
+    b.onclick=()=>openItem(it);fr.appendChild(b)}
+  g.appendChild(fr)}
+
+/* ---------- viewer ---------- */
+let cur=null,pdfDoc=null,io=null;
+async function readAll(id){const d=await get('data',id);const parts=[];for(const c of d.chunks)parts.push(await unseal(c));return parts}
+async function openItem(it){cur=it;$('#vt').textContent=it.title;$('#view').classList.remove('hide');const body=$('#vbody');body.textContent='';body.className='';body.scrollTop=0;
+  try{toast('Membuka…',1200);const parts=await readAll(it.id);
+    if(it.type==='pdf'){await loadPdfJs();const buf=new Uint8Array(parts.reduce((a,p)=>a+p.byteLength,0));let o=0;for(const p of parts){buf.set(new Uint8Array(p),o);o+=p.byteLength}
+      await readPdf(buf,body)}
+    else{curUrl=URL.createObjectURL(new Blob(parts,{type:it.mime}));body.className='center';
+      const el=document.createElement(it.type==='video'?'video':'img');el.src=curUrl;if(it.type==='video'){el.controls=true;el.playsInline=true;el.autoplay=true}body.appendChild(el)}
+  }catch(e){toast(e.message||'Gagal membuka',3500)}}
+async function readPdf(buf,body){pdfDoc=await pdfjsLib.getDocument({data:buf}).promise;const wrap=document.createElement('div');wrap.id='pages';body.appendChild(wrap);
+  const p1=await pdfDoc.getPage(1),v1=p1.getViewport({scale:1}),W=Math.min(body.clientWidth,900),dpr=Math.min(devicePixelRatio||1,2);
+  io=new IntersectionObserver(es=>es.forEach(e=>{const d=e.target;if(e.isIntersecting)paint(d,W,dpr);else unpaint(d)}),{root:body,rootMargin:'700px 0px'});
+  for(let n=1;n<=pdfDoc.numPages;n++){const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=v1.width+'/'+v1.height;wrap.appendChild(d);io.observe(d)}}
+async function paint(d,W,dpr){if(d.dataset.on||!pdfDoc)return;d.dataset.on=1;
+  try{const p=await pdfDoc.getPage(+d.dataset.n),b=p.getViewport({scale:1}),vp=p.getViewport({scale:W*dpr/b.width}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+    await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;if(d.dataset.on){d.textContent='';d.appendChild(c)}}catch{delete d.dataset.on}}
+function unpaint(d){if(!d.dataset.on)return;delete d.dataset.on;d.textContent=''}
+function closeView(){$('#view').classList.add('hide');$('#vbody').textContent='';if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}cur=null}
+$('#vx').onclick=closeView;
+$('#vd').onclick=async()=>{if(!cur||!confirm('Hapus "'+cur.title+'" selamanya?'))return;const id=cur.id;closeView();await del('meta',id);await del('data',id);await load();toast('Dihapus')};
+$('#vr').onclick=async()=>{if(!cur)return;const t=prompt('Judul baru',cur.title);if(!t||!t.trim())return;const r=await get('meta',cur.id),m=await unsealJSON(r.m);m.title=t.trim();r.m=await sealJSON(m);await put('meta',r);cur.title=m.title;$('#vt').textContent=m.title;await load()};
+
+/* ---------- tab, tambah ---------- */
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+$('#add').onclick=()=>$('#file').click();
+$('#file').onchange=e=>{const l=[...e.target.files];e.target.value='';if(l.length)addFiles(l)};
+
+/* ---------- kunci / buka ---------- */
+let taps=0,tapT;
+$('#n404').onclick=()=>{taps++;clearTimeout(tapT);tapT=setTimeout(()=>taps=0,900);if(taps>=3){showForm()}};
+async function showForm(){const auth=await get('cfg','auth');$('#nf').classList.add('hide');$('#lf').classList.remove('hide');
+  $('#pw2').classList.toggle('hide',!!auth);$('#lgo').textContent=auth?'Buka':'Buat kunci';$('#lmsg').textContent=auth?'':'Buat kata sandi. Jika lupa, data tidak bisa dipulihkan.';$('#pw').focus()}
+$('#lf').onsubmit=async e=>{e.preventDefault();const pw=$('#pw').value;if(pw.length<4){$('#lmsg').textContent='Minimal 4 karakter';return}
+  $('#lgo').disabled=true;const auth=await get('cfg','auth');
+  try{if(!auth){if(pw!==$('#pw2').value){$('#lmsg').textContent='Kata sandi tidak sama';return}
+      const salt=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(pw,salt);await put('cfg',{k:'auth',salt:salt.buffer,check:await seal(te.encode('ok'))});
+      if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}
+    else{const k=await derive(pw,new Uint8Array(auth.salt));KEY=k;try{await unseal(auth.check)}catch{KEY=null;$('#lmsg').textContent='Salah';$('#pw').value='';return}}
+    $('#pw').value=$('#pw2').value='';$('#lock').classList.add('hide');$('#app').classList.remove('hide');await load()}
+  finally{$('#lgo').disabled=false}};
+function lock(){KEY=null;items=[];urls.forEach(URL.revokeObjectURL);urls=[];closeView();$('#grid').textContent='';$('#app').classList.add('hide');
+  $('#lf').classList.add('hide');$('#nf').classList.remove('hide');$('#lock').classList.remove('hide');taps=0}
+$('#lockbtn').onclick=lock;
+document.addEventListener('visibilitychange',()=>{if(document.hidden){hideTimer=setTimeout(()=>KEY&&lock(),30000)}else clearTimeout(hideTimer)});
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
