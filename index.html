@@ -34,7 +34,7 @@ header{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 70%,
 .tabs button{padding:7px 15px;border-radius:99px;background:var(--s1);color:var(--mu);white-space:nowrap;transition:background .2s,color .2s}
 .tabs button.on{background:var(--ac2);color:var(--ac)}
 main{padding:6px 14px calc(110px + var(--safe-b))}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--min,150px),1fr));gap:var(--gap,12px)}
 .card{position:relative;border-radius:var(--r);overflow:hidden;background:var(--s1);aspect-ratio:3/4;text-align:left;content-visibility:auto;contain-intrinsic-size:200px 266px;transition:transform .18s}
 .card:active{transform:scale(.97)}
 .card img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .35s}
@@ -47,7 +47,7 @@ main{padding:6px 14px calc(110px + var(--safe-b))}
 .empty b{display:block;color:var(--tx);font-size:17px;margin-bottom:6px;font-weight:600}
 #add{position:fixed;right:18px;bottom:calc(20px + var(--safe-b));width:58px;height:58px;border-radius:20px;background:var(--ac);color:#0a1411;font-size:30px;font-weight:300;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:6;transition:transform .2s}
 #add:active{transform:scale(.92)}
-#lockbtn{color:var(--mu);padding:4px 0 4px 14px;font-size:13px}
+#lockbtn,#setbtn{color:var(--mu);padding:4px 0 4px 14px;font-size:13px}
 /* toast */
 #toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-b));transform:translate(-50%,20px);background:var(--s2);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:70;font-size:13px;max-width:88vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -63,9 +63,44 @@ main{padding:6px 14px calc(110px + var(--safe-b))}
 #vbody.center{align-items:center}
 #vbody img,#vbody video{max-width:100%;max-height:100%;display:block}
 #pages{width:min(100%,900px)}
-#pages .pg{position:relative;background:#14171b;margin:0 auto}
+#pages .pg{position:relative;background:#14171b;margin:0 auto var(--pg,0px)}
 #pages canvas{width:100%;height:100%;display:block}
 .bar{position:fixed;left:0;right:0;top:0;height:2px;background:var(--ac);transform-origin:left;transform:scaleX(0);z-index:80;transition:transform .2s}
+body[data-cs=sharp]{--r:4px}body[data-cs=flat]{--r:0px;--gap:2px}
+.cell{position:relative}.card{width:100%;display:block}
+.cell.in{animation:cin .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*24ms)}
+@keyframes cin{from{opacity:0;transform:translateY(14px)}}
+.grid.sl{animation:sl .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes sl{from{opacity:0;transform:translateX(var(--dx,0))}}
+.card .pr{position:absolute;left:0;bottom:0;height:3px;background:var(--ac);z-index:1;border-radius:0 3px 3px 0}
+.card .bd{position:absolute;top:8px;left:8px;z-index:1;background:var(--ac);color:#0a1411;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.card .bd.dn{background:var(--s2);color:var(--tx)}
+.list .grid{grid-template-columns:1fr;gap:8px}
+.list .card{display:flex;align-items:center;aspect-ratio:auto;height:78px;contain-intrinsic-size:auto 78px}
+.list .card img,.list .card .ph{position:static;width:62px;height:100%;flex:none;background:var(--s2)}
+.list .card .cap{position:static;background:none;padding:0 14px;flex:1;align-items:center;font-size:14px}
+.list .card .bd{top:6px;left:6px}
+.rak .grid{grid-template-columns:repeat(auto-fill,minmax(calc(var(--min,150px)*.72),1fr));column-gap:0;row-gap:26px}
+.rak .cell{padding:0 7px 15px}
+.rak .cell::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;background:linear-gradient(#343b45,#191d22);box-shadow:0 8px 14px rgba(0,0,0,.55)}
+.rak .card{aspect-ratio:2/3;border-radius:3px 7px 7px 3px;box-shadow:inset 3px 0 4px rgba(255,255,255,.08),3px 4px 10px rgba(0,0,0,.55)}
+.rak .cap{padding-top:18px}.rak .cap i{display:none}.rak .cap em{-webkit-line-clamp:1;font-size:11px}
+body[data-fab=center] #add{right:auto;left:50%;margin-left:-29px}
+#app{transition:opacity .26s,transform .26s}#app.closing{opacity:0;transform:scale(.97)}
+#lock{animation:fade .3s}
+.shake{animation:shk .35s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+#sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;animation:fade .2s}
+#sheet .pn{background:var(--s1);width:100%;max-width:560px;margin:0 auto;border-radius:22px 22px 0 0;padding:6px 18px calc(24px + var(--safe-b));max-height:88vh;overflow:auto;animation:up .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+.pn h3{font-size:13px;font-weight:500;color:var(--mu);margin:18px 0 8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.seg button{padding:8px 14px;border-radius:99px;background:var(--s2);color:var(--mu);transition:background .2s,color .2s}
+.seg button.on{background:var(--ac2);color:var(--ac)}
+.pn .big{display:block;width:100%;padding:14px;border-radius:12px;background:var(--s2);margin-top:8px;text-align:left}
+.pn .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}.pn .row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pn small{color:var(--mu)}
+.bar2{height:6px;border-radius:9px;background:var(--s2);overflow:hidden;margin:8px 0}.bar2 i{display:block;height:100%;background:var(--ac)}
+body.noanim *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
 <div class="bar" id="bar"></div>
@@ -82,7 +117,7 @@ main{padding:6px 14px calc(110px + var(--safe-b))}
 
 <div id="app" class="hide">
   <header>
-    <div class="top"><b id="ttl">Koleksi</b><div><span id="cnt"></span><button id="lockbtn">Kunci</button></div></div>
+    <div class="top"><b id="ttl">Koleksi</b><div><span id="cnt"></span><button id="setbtn">Atur</button><button id="lockbtn">Kunci</button></div></div>
     <div class="tabs" id="tabs">
       <button data-t="all" class="on">Semua</button><button data-t="image">Foto</button><button data-t="video">Video</button><button data-t="pdf">Komik</button>
     </div>
@@ -96,6 +131,7 @@ main{padding:6px 14px calc(110px + var(--safe-b))}
   <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vr">Ubah judul</button><button class="del" id="vd">Hapus</button></div>
   <div id="vbody"></div>
 </div>
+<input id="bfile" type="file" class="hide">
 <div id="toast"></div>
 
 <script>
@@ -103,6 +139,59 @@ main{padding:6px 14px calc(110px + var(--safe-b))}
 const $=s=>document.querySelector(s), CH=2*1024*1024, PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 const te=new TextEncoder(), td=new TextDecoder();
 let KEY=null, items=[], tab='all', urls=[], curUrl=null, hideTimer=null;
+/* ---------- pengaturan tampilan ---------- */
+let S={vw:'grid',gs:'m',cs:'round',fab:'right',pw:'full',pgap:0,hap:1,anim:1};
+try{Object.assign(S,JSON.parse(localStorage.getItem('ui')||'{}'))}catch{}
+const saveS=()=>{try{localStorage.setItem('ui',JSON.stringify(S))}catch{}};
+function applyS(){const b=document.body;b.dataset.cs=S.cs;b.dataset.fab=S.fab;b.classList.toggle('list',S.vw==='list');b.classList.toggle('rak',S.vw==='rak');b.classList.toggle('noanim',!S.anim);
+  b.style.setProperty('--min',{s:'105px',m:'150px',l:'230px'}[S.gs]);b.style.setProperty('--pg',S.pgap+'px')}
+applyS();
+const hap=n=>{if(S.hap&&navigator.vibrate)try{navigator.vibrate(n||8)}catch{}};
+const fmt=n=>n>=1e9?(n/1e9).toFixed(2)+' GB':n>=1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function sheet(html,bind){closeSheet();const s=document.createElement('div');s.id='sheet';s.innerHTML='<div class="pn">'+html+'</div>';s.onclick=e=>{if(e.target===s)closeSheet()};document.body.appendChild(s);bind&&bind(s.firstChild)}
+function closeSheet(){const s=$('#sheet');s&&s.remove()}
+const pick=a=>{const f=$('#file');f.accept=a;f.click()};
+function sheetAdd(){sheet('<h3>Tambah</h3><button class="big" data-a="image/*">Foto</button><button class="big" data-a="video/*">Video</button><button class="big" data-a="application/pdf,.pdf">Komik PDF</button>',
+  pn=>pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(8);closeSheet();pick(b.dataset.a)})}
+function openSettings(){
+  const seg=(k,o)=>`<div class="seg">${o.map(([v,t])=>`<button data-k="${k}" data-v="${v}" class="${S[k]==v?'on':''}">${t}</button>`).join('')}</div>`;
+  sheet(`<h3>Tampilan</h3>${seg('vw',[['grid','Grid'],['list','Daftar'],['rak','Rak buku']])}
+<h3>Ukuran grid</h3>${seg('gs',[['s','Kecil'],['m','Sedang'],['l','Besar']])}
+<h3>Gaya kartu</h3>${seg('cs',[['round','Bulat'],['sharp','Tajam'],['flat','Rapat']])}
+<h3>Tombol tambah</h3>${seg('fab',[['right','Kanan'],['center','Tengah'],['menu','Menu']])}
+<h3>Pembaca komik</h3>${seg('pw',[['full','Lebar penuh'],['mid','Sedang'],['fit','Pas layar']])}${seg('pgap',[[0,'Tanpa jarak'],[8,'Jarak kecil'],[20,'Jarak besar']])}
+<h3>Efek</h3>${seg('hap',[[1,'Getar aktif'],[0,'Getar mati']])}${seg('anim',[[1,'Animasi'],[0,'Tanpa animasi']])}
+<h3>Penyimpanan</h3><div id="stor">Menghitung…</div>
+<h3>Cadangan</h3><button class="big" id="bk">Ekspor cadangan terenkripsi</button><button class="big" id="bi">Impor cadangan</button>`,pn=>{
+    pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(6);
+      if(b.dataset.k){const k=b.dataset.k,v=b.dataset.v;S[k]=isNaN(v)?v:+v;saveS();applyS();[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x===b));if(['vw','gs','cs'].includes(k))render()}
+      else if(b.id==='bk'){closeSheet();exportBackup()}else if(b.id==='bi')$('#bfile').click()};
+    (async()=>{const st=navigator.storage,e=st&&st.estimate?await st.estimate():{},per=st&&st.persisted?await st.persisted():false,tot=items.reduce((a,x)=>a+x.size,0),
+      big=[...items].sort((a,b)=>b.size-a.size).slice(0,3),q=e.quota||0,u=e.usage||0,el=pn.querySelector('#stor');if(!el)return;
+      el.innerHTML=`${fmt(tot)} terkunci, ${items.length} item<div class="bar2"><i style="width:${q?Math.max(1,u/q*100):0}%"></i></div><small>Terpakai ${fmt(u)} dari ${fmt(q)}. ${per?'Penyimpanan permanen.':'Browser bisa menghapus jika memori penuh.'}</small>`+big.map(x=>`<div class="row"><span>${esc(x.title)}</span><span>${fmt(x.size)}</span></div>`).join('')})()})}
+
+/* ---------- cadangan terenkripsi (.vault) ---------- */
+const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n);return b};
+const rec=(h,bufs)=>{const hb=te.encode(JSON.stringify({...h,l:bufs.map(b=>b.byteLength)}));return new Blob([u32(hb.length),hb,...bufs])};
+const eq=(a,b)=>{a=new Uint8Array(a);b=new Uint8Array(b);return a.length===b.length&&a.every((x,i)=>x===b[i])};
+async function exportBackup(){try{toast('Menyiapkan cadangan…',60000);const auth=await get('cfg','auth'),parts=[te.encode('VLT1'),rec({t:'auth'},[auth.salt,auth.check])];
+    for(const r of await all('meta')){const d=await get('data',r.id);if(d)parts.push(rec({t:'data',id:r.id},d.chunks));parts.push(rec({t:'meta',id:r.id},r.th?[r.m,r.th]:[r.m]))}
+    for(const r of await all('cfg'))if(r.k.startsWith('prog:'))parts.push(rec({t:'prog',id:r.k.slice(5)},[r.v]));
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(parts));a.download='notes-'+new Date().toISOString().slice(0,10)+'.vault';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),60000);toast('Cadangan dibuat. Isinya tetap terenkripsi.',3800)}catch(e){console.error(e);toast('Gagal membuat cadangan',3000)}}
+async function importBackup(file){try{toast('Membaca cadangan…',60000);if(td.decode(await file.slice(0,4).arrayBuffer())!=='VLT1')throw new Error('Bukan file cadangan');
+    const cur=await get('cfg','auth'),have=new Set((await all('meta')).map(r=>r.id));let o=4,k2=KEY,n=0,skip=new Set();
+    const rs=async b=>k2===KEY?b:await seal(await unseal(b,k2));
+    while(o<file.size){const hl=new DataView(await file.slice(o,o+4).arrayBuffer()).getUint32(0);o+=4;const h=JSON.parse(td.decode(await file.slice(o,o+hl).arrayBuffer()));o+=hl;
+      const bufs=[];for(const l of h.l){bufs.push(await file.slice(o,o+l).arrayBuffer());o+=l}
+      if(h.t==='auth'){if(!eq(bufs[0],cur.salt)){const pw=prompt('Kata sandi untuk cadangan ini:');if(!pw)return toast('Dibatalkan');k2=await derive(pw,new Uint8Array(bufs[0]));try{await unseal(bufs[1],k2)}catch{return toast('Kata sandi cadangan salah',3000)}}}
+      else if(h.t==='data'){if(have.has(h.id)){skip.add(h.id);continue}const ch=[];for(const b of bufs)ch.push(await rs(b));await put('data',{id:h.id,chunks:ch})}
+      else if(h.t==='meta'){if(skip.has(h.id)||have.has(h.id))continue;await put('meta',{id:h.id,m:await rs(bufs[0]),th:bufs[1]?await rs(bufs[1]):null});n++}
+      else if(h.t==='prog'){if(!(await get('cfg','prog:'+h.id)))await put('cfg',{k:'prog:'+h.id,v:await rs(bufs[0])})}}
+    await load();toast(n+' item dipulihkan',3000)}catch(e){console.error(e);toast('Gagal impor: '+(e.message||'file rusak'),3500)}}
+$('#bfile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f){closeSheet();importBackup(f)}};
+
 
 /* ---------- storage (IndexedDB, tidak muncul di galeri / file manager) ---------- */
 const dbp=new Promise((res,rej)=>{const r=indexedDB.open('cache-v2',1);
@@ -116,7 +205,7 @@ async function derive(pw,salt){const m=await crypto.subtle.importKey('raw',te.en
   return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
 async function seal(buf){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},KEY,buf);
   const o=new Uint8Array(12+ct.byteLength);o.set(iv);o.set(new Uint8Array(ct),12);return o.buffer}
-async function unseal(buf){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},KEY,u.slice(12))}
+async function unseal(buf,k=KEY){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},k,u.slice(12))}
 const sealJSON=o=>seal(te.encode(JSON.stringify(o))), unsealJSON=async b=>JSON.parse(td.decode(await unseal(b)));
 
 /* ---------- util ---------- */
@@ -157,22 +246,26 @@ async function addFiles(list){const files=[...list];let i=0,fail=0;
   toast(fail?`Selesai, ${fail} gagal`:'Tersimpan & terkunci. Hapus file asli dari galeri HP.',3600);await load()}
 
 /* ---------- daftar ---------- */
-async function load(){urls.forEach(URL.revokeObjectURL);urls=[];const rows=await all('meta');items=[];
+let prog={},stag=false;
+async function load(){urls.forEach(URL.revokeObjectURL);urls=[];const rows=await all('meta');items=[];prog={};
   for(const r of rows){try{const m=await unsealJSON(r.m);let th=null;if(r.th){th=URL.createObjectURL(new Blob([await unseal(r.th)],{type:'image/jpeg'}));urls.push(th)}items.push({id:r.id,...m,th})}catch{}}
-  items.sort((a,b)=>b.added-a.added);render()}
+  for(const r of await all('cfg')){if(r.k.startsWith('prog:')){try{prog[r.k.slice(5)]=await unsealJSON(r.v)}catch{}}}
+  items.sort((a,b)=>b.added-a.added);stag=true;render()}
 const ICON={image:'▣',video:'▶',pdf:'❏'}, TAG={image:'foto',video:'video',pdf:'komik'};
-function render(){const g=$('#grid'),list=items.filter(x=>tab==='all'||x.type===tab);g.textContent='';
+function render(dx){const g=$('#grid'),list=items.filter(x=>tab==='all'||x.type===tab);g.textContent='';g.className='grid';
   $('#empty').classList.toggle('hide',list.length>0);$('#cnt').textContent=items.length?items.length+' item':'';
   const fr=document.createDocumentFragment();
-  for(const it of list){const b=document.createElement('button');b.className='card';
-    b.innerHTML=`<div class="ph">${ICON[it.type]}</div>${it.th?'<img alt="" decoding="async" loading="lazy">':''}<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`;
-    b.querySelector('em').textContent=it.title;
-    const im=b.querySelector('img');if(im){im.src=it.th;im.onload=()=>im.classList.add('ld')}
-    b.onclick=()=>openItem(it);fr.appendChild(b)}
-  g.appendChild(fr)}
+  list.forEach((it,i)=>{const c=document.createElement('div');c.className='cell';if(stag&&S.anim&&i<14){c.classList.add('in');c.style.setProperty('--i',i)}
+    const b=document.createElement('button'),pg=prog[it.id],done=pg&&pg.p>=pg.n,fresh=!pg&&Date.now()-it.added<6048e5;b.className='card';
+    b.innerHTML=(it.th?'<img alt="" decoding="async" loading="lazy">':`<div class="ph">${ICON[it.type]}</div>`)+`<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`+
+      (done?'<span class="bd dn">selesai</span>':fresh?'<span class="bd">baru</span>':'')+(pg&&!done?`<span class="pr" style="width:${Math.round(pg.p/pg.n*100)}%"></span>`:'');
+    b.querySelector('em').textContent=it.title;const im=b.querySelector('img');if(im){im.onload=()=>im.classList.add('ld');im.src=it.th}
+    b.onclick=()=>{hap(8);openItem(it)};c.appendChild(b);fr.appendChild(c)});
+  g.appendChild(fr);stag=false;
+  if(dx&&S.anim){g.style.setProperty('--dx',dx*30+'px');void g.offsetWidth;g.classList.add('sl')}}
 
 /* ---------- viewer ---------- */
-let cur=null,pdfDoc=null,io=null;
+let cur=null,pdfDoc=null,io=null,pt=null,flushProg=null;
 async function readAll(id){const d=await get('data',id);const parts=[];for(const c of d.chunks)parts.push(await unseal(c));return parts}
 async function openItem(it){cur=it;$('#vt').textContent=it.title;$('#view').classList.remove('hide');const body=$('#vbody');body.textContent='';body.className='';body.scrollTop=0;
   try{toast('Membuka…',1200);const parts=await readAll(it.id);
@@ -182,21 +275,26 @@ async function openItem(it){cur=it;$('#vt').textContent=it.title;$('#view').clas
       const el=document.createElement(it.type==='video'?'video':'img');el.src=curUrl;if(it.type==='video'){el.controls=true;el.playsInline=true;el.autoplay=true}body.appendChild(el)}
   }catch(e){toast(e.message||'Gagal membuka',3500)}}
 async function readPdf(buf,body){pdfDoc=await pdfjsLib.getDocument({data:buf}).promise;const wrap=document.createElement('div');wrap.id='pages';body.appendChild(wrap);
-  const p1=await pdfDoc.getPage(1),v1=p1.getViewport({scale:1}),W=Math.min(body.clientWidth,900),dpr=Math.min(devicePixelRatio||1,2);
+  const p1=await pdfDoc.getPage(1),v1=p1.getViewport({scale:1}),W=Math.min(body.clientWidth,S.pw==='mid'?680:900,S.pw==='fit'?body.clientHeight*v1.width/v1.height:9e9),dpr=Math.min(devicePixelRatio||1,2);wrap.style.width=W+'px';
   io=new IntersectionObserver(es=>es.forEach(e=>{const d=e.target;if(e.isIntersecting)paint(d,W,dpr);else unpaint(d)}),{root:body,rootMargin:'700px 0px'});
-  for(let n=1;n<=pdfDoc.numPages;n++){const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=v1.width+'/'+v1.height;wrap.appendChild(d);io.observe(d)}}
+  for(let n=1;n<=pdfDoc.numPages;n++){const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=v1.width+'/'+v1.height;wrap.appendChild(d);io.observe(d)}
+  const id=cur.id,N=pdfDoc.numPages,pr=prog[id];
+  const calc=()=>{if(!wrap.isConnected)return;const h=wrap.children[0].offsetHeight+S.pgap;let p=Math.floor((body.scrollTop+body.clientHeight/3)/h)+1;if(body.scrollTop+body.clientHeight>=body.scrollHeight-24)p=N;p=Math.max(1,Math.min(N,p));prog[id]={p,n:N};sealJSON({p,n:N}).then(v=>put('cfg',{k:'prog:'+id,v}))};
+  body.onscroll=()=>{clearTimeout(pt);flushProg=calc;pt=setTimeout(()=>{calc();flushProg=null},400)};
+  if(pr&&pr.p>1&&pr.p<pr.n)requestAnimationFrame(()=>wrap.children[pr.p-1]&&wrap.children[pr.p-1].scrollIntoView())}
 async function paint(d,W,dpr){if(d.dataset.on||!pdfDoc)return;d.dataset.on=1;
   try{const p=await pdfDoc.getPage(+d.dataset.n),b=p.getViewport({scale:1}),vp=p.getViewport({scale:W*dpr/b.width}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
     await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;if(d.dataset.on){d.textContent='';d.appendChild(c)}}catch{delete d.dataset.on}}
 function unpaint(d){if(!d.dataset.on)return;delete d.dataset.on;d.textContent=''}
-function closeView(){$('#view').classList.add('hide');$('#vbody').textContent='';if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}cur=null}
+function closeView(){clearTimeout(pt);if(flushProg){flushProg();flushProg=null}$('#view').classList.add('hide');$('#vbody').onscroll=null;$('#vbody').textContent='';if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}cur=null;if(items.length)render()}
 $('#vx').onclick=closeView;
 $('#vd').onclick=async()=>{if(!cur||!confirm('Hapus "'+cur.title+'" selamanya?'))return;const id=cur.id;closeView();await del('meta',id);await del('data',id);await load();toast('Dihapus')};
 $('#vr').onclick=async()=>{if(!cur)return;const t=prompt('Judul baru',cur.title);if(!t||!t.trim())return;const r=await get('meta',cur.id),m=await unsealJSON(r.m);m.title=t.trim();r.m=await sealJSON(m);await put('meta',r);cur.title=m.title;$('#vt').textContent=m.title;await load()};
 
 /* ---------- tab, tambah ---------- */
-$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;[...$('#tabs').children].forEach(x=>x.classList.toggle('on',x===b));render()};
-$('#add').onclick=()=>$('#file').click();
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const o=[...$('#tabs').children],n=o.indexOf(b),p=o.findIndex(x=>x.classList.contains('on'));if(n===p)return;hap(6);tab=b.dataset.t;o.forEach(x=>x.classList.toggle('on',x===b));render(n>p?1:-1)};
+$('#add').onclick=()=>{hap(10);S.fab==='menu'?sheetAdd():pick('image/*,video/*,application/pdf,.pdf')};
+$('#setbtn').onclick=()=>{hap(8);openSettings()};
 $('#file').onchange=e=>{const l=[...e.target.files];e.target.value='';if(l.length)addFiles(l)};
 
 /* ---------- kunci / buka ---------- */
@@ -209,12 +307,13 @@ $('#lf').onsubmit=async e=>{e.preventDefault();const pw=$('#pw').value;if(pw.len
   try{if(!auth){if(pw!==$('#pw2').value){$('#lmsg').textContent='Kata sandi tidak sama';return}
       const salt=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(pw,salt);await put('cfg',{k:'auth',salt:salt.buffer,check:await seal(te.encode('ok'))});
       if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}
-    else{const k=await derive(pw,new Uint8Array(auth.salt));KEY=k;try{await unseal(auth.check)}catch{KEY=null;$('#lmsg').textContent='Salah';$('#pw').value='';return}}
+    else{const k=await derive(pw,new Uint8Array(auth.salt));KEY=k;try{await unseal(auth.check)}catch{KEY=null;$('#lmsg').textContent='Salah';$('#pw').classList.remove('shake');void $('#pw').offsetWidth;$('#pw').classList.add('shake');hap([30,40,30]);$('#pw').value='';return}}
     $('#pw').value=$('#pw2').value='';$('#lock').classList.add('hide');$('#app').classList.remove('hide');await load()}
   finally{$('#lgo').disabled=false}};
-function lock(){KEY=null;items=[];urls.forEach(URL.revokeObjectURL);urls=[];closeView();$('#grid').textContent='';$('#app').classList.add('hide');
+function lockNow(){KEY=null;items=[];closeSheet();urls.forEach(URL.revokeObjectURL);urls=[];closeView();$('#grid').textContent='';$('#app').classList.add('hide');
   $('#lf').classList.add('hide');$('#nf').classList.remove('hide');$('#lock').classList.remove('hide');taps=0}
-$('#lockbtn').onclick=lock;
+function lock(a){KEY=null;if(a&&S.anim&&!$('#app').classList.contains('hide')){$('#app').classList.add('closing');setTimeout(()=>{lockNow();$('#app').classList.remove('closing')},260)}else lockNow()}
+$('#lockbtn').onclick=()=>{hap(12);lock(true)};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){hideTimer=setTimeout(()=>KEY&&lock(),30000)}else clearTimeout(hideTimer)});
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
