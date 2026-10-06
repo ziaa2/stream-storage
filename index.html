@@ -100,6 +100,32 @@ body[data-fab=center] #add{right:auto;left:50%;margin-left:-29px}
 .pn .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}.pn .row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pn small{color:var(--mu)}
 .bar2{height:6px;border-radius:9px;background:var(--s2);overflow:hidden;margin:8px 0}.bar2 i{display:block;height:100%;background:var(--ac)}
+#view{animation:none;background:var(--vbg,#07080a);overflow:hidden}
+body[data-vbg=g]{--vbg:#181b20}body[data-vbg=b]{--vbg:#0a0b0d}
+#vblur{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(38px) brightness(.38);z-index:0;display:none}
+body[data-vbg=b] #vblur{display:block}
+#vbody{position:absolute;inset:0;z-index:1}
+#vbody.center{overflow:hidden;touch-action:none;align-items:center}
+#vbar{position:absolute;top:0;left:0;right:0;z-index:3;background:linear-gradient(rgba(6,7,9,.88),transparent);padding-bottom:22px;transition:opacity .25s,transform .25s}
+#stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+#stage img.pre{opacity:.85}
+#view.hid #vbar{opacity:0;transform:translateY(-100%);pointer-events:none}
+.nv{position:absolute;top:50%;margin-top:-32px;z-index:3;width:42px;height:64px;border-radius:14px;background:rgba(20,22,26,.5);font-size:26px;transition:opacity .25s;backdrop-filter:blur(6px)}
+#nvp{left:8px}#nvn{right:8px}
+#pos{position:absolute;left:50%;bottom:calc(16px + var(--safe-b));transform:translateX(-50%);z-index:3;background:rgba(20,22,26,.62);padding:5px 14px;border-radius:99px;font-size:13px;transition:opacity .25s;backdrop-filter:blur(6px);pointer-events:none}
+#view.med #pos{bottom:auto;top:calc(var(--safe-t) + 58px)}
+#view.hid .nv,#view.hid #pos{opacity:0;pointer-events:none}
+#view.hid.cm #pos{opacity:.8}
+#pages img{width:100%;height:100%;max-height:none;display:block;object-fit:contain}
+#endp{padding:44px 14px calc(44px + var(--safe-b));text-align:center}
+#endp h2{font-size:24px;font-weight:600;letter-spacing:-.3px}#endp p{color:var(--mu);margin:4px 0 14px}
+#endp h4{font-size:13px;color:var(--mu);font-weight:500;text-align:left;margin:26px 0 10px}
+.eb{padding:11px 20px;border-radius:12px;background:var(--ac2);color:var(--ac);margin:4px}
+.rrow{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+.rc{flex:none;width:112px;aspect-ratio:3/4;border-radius:12px;overflow:hidden;position:relative;background:var(--s1);text-align:left}
+.rc img{width:100%;height:100%;object-fit:cover;display:block}
+.rc .ph{position:absolute;inset:0;display:grid;place-items:center;color:#3a424c;font-size:30px}
+.rc span{position:absolute;left:0;right:0;bottom:0;padding:20px 7px 6px;font-size:11px;line-height:1.2;background:linear-gradient(transparent,rgba(8,10,12,.92));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 body.noanim *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
@@ -124,12 +150,12 @@ body.noanim *{animation:none!important;transition:none!important}
   </header>
   <main><div class="grid" id="grid"></div><div class="empty hide" id="empty"><b>Masih kosong</b>Tekan + untuk menambah foto, video, atau PDF komik.</div></main>
   <button id="add" aria-label="Tambah">+</button>
-  <input id="file" type="file" multiple accept="image/*,video/*,application/pdf,.pdf" class="hide">
+  <input id="file" type="file" multiple accept="image/*,video/*,application/pdf,.pdf,.zip,.cbz,application/zip" class="hide">
 </div>
 
-<div id="view" class="hide">
-  <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vr">Ubah judul</button><button class="del" id="vd">Hapus</button></div>
-  <div id="vbody"></div>
+<div id="view" class="hide"><div id="vblur"></div><div id="vbody"></div>
+  <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vs" class="hide">Slideshow</button><button id="vr">Judul</button><button class="del" id="vd">Hapus</button></div>
+  <button class="nv hide" id="nvp">‹</button><button class="nv hide" id="nvn">›</button><div id="pos"></div>
 </div>
 <input id="bfile" type="file" class="hide">
 <div id="toast"></div>
@@ -140,10 +166,10 @@ const $=s=>document.querySelector(s), CH=2*1024*1024, PDFJS='https://cdnjs.cloud
 const te=new TextEncoder(), td=new TextDecoder();
 let KEY=null, items=[], tab='all', urls=[], curUrl=null, hideTimer=null;
 /* ---------- pengaturan tampilan ---------- */
-let S={vw:'grid',gs:'m',cs:'round',fab:'right',pw:'full',pgap:0,hap:1,anim:1};
+let S={vw:'grid',gs:'m',cs:'round',fab:'right',pw:'full',pgap:0,hap:1,anim:1,vbg:'k',ssd:5};
 try{Object.assign(S,JSON.parse(localStorage.getItem('ui')||'{}'))}catch{}
 const saveS=()=>{try{localStorage.setItem('ui',JSON.stringify(S))}catch{}};
-function applyS(){const b=document.body;b.dataset.cs=S.cs;b.dataset.fab=S.fab;b.classList.toggle('list',S.vw==='list');b.classList.toggle('rak',S.vw==='rak');b.classList.toggle('noanim',!S.anim);
+function applyS(){const b=document.body;b.dataset.cs=S.cs;b.dataset.fab=S.fab;b.dataset.vbg=S.vbg;b.classList.toggle('list',S.vw==='list');b.classList.toggle('rak',S.vw==='rak');b.classList.toggle('noanim',!S.anim);
   b.style.setProperty('--min',{s:'105px',m:'150px',l:'230px'}[S.gs]);b.style.setProperty('--pg',S.pgap+'px')}
 applyS();
 const hap=n=>{if(S.hap&&navigator.vibrate)try{navigator.vibrate(n||8)}catch{}};
@@ -152,7 +178,7 @@ const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 function sheet(html,bind){closeSheet();const s=document.createElement('div');s.id='sheet';s.innerHTML='<div class="pn">'+html+'</div>';s.onclick=e=>{if(e.target===s)closeSheet()};document.body.appendChild(s);bind&&bind(s.firstChild)}
 function closeSheet(){const s=$('#sheet');s&&s.remove()}
 const pick=a=>{const f=$('#file');f.accept=a;f.click()};
-function sheetAdd(){sheet('<h3>Tambah</h3><button class="big" data-a="image/*">Foto</button><button class="big" data-a="video/*">Video</button><button class="big" data-a="application/pdf,.pdf">Komik PDF</button>',
+function sheetAdd(){sheet('<h3>Tambah</h3><button class="big" data-a="image/*">Foto</button><button class="big" data-a="video/*">Video</button><button class="big" data-a="application/pdf,.pdf,.zip,.cbz,application/zip">Komik (PDF / ZIP)</button>',
   pn=>pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(8);closeSheet();pick(b.dataset.a)})}
 function openSettings(){
   const seg=(k,o)=>`<div class="seg">${o.map(([v,t])=>`<button data-k="${k}" data-v="${v}" class="${S[k]==v?'on':''}">${t}</button>`).join('')}</div>`;
@@ -160,6 +186,8 @@ function openSettings(){
 <h3>Ukuran grid</h3>${seg('gs',[['s','Kecil'],['m','Sedang'],['l','Besar']])}
 <h3>Gaya kartu</h3>${seg('cs',[['round','Bulat'],['sharp','Tajam'],['flat','Rapat']])}
 <h3>Tombol tambah</h3>${seg('fab',[['right','Kanan'],['center','Tengah'],['menu','Menu']])}
+<h3>Latar viewer</h3>${seg('vbg',[['k','Hitam'],['g','Abu gelap'],['b','Blur foto']])}
+<h3>Slideshow</h3>${seg('ssd',[[3,'3 detik'],[5,'5 detik'],[8,'8 detik']])}
 <h3>Pembaca komik</h3>${seg('pw',[['full','Lebar penuh'],['mid','Sedang'],['fit','Pas layar']])}${seg('pgap',[[0,'Tanpa jarak'],[8,'Jarak kecil'],[20,'Jarak besar']])}
 <h3>Efek</h3>${seg('hap',[[1,'Getar aktif'],[0,'Getar mati']])}${seg('anim',[[1,'Animasi'],[0,'Tanpa animasi']])}
 <h3>Penyimpanan</h3><div id="stor">Menghitung…</div>
@@ -212,7 +240,8 @@ const sealJSON=o=>seal(te.encode(JSON.stringify(o))), unsealJSON=async b=>JSON.p
 function toast(t,ms=2200){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),ms)}
 const clean=n=>n.replace(/\.[^.]+$/,'').replace(/[_\-.]+/g,' ').replace(/\s+/g,' ').trim()||'Tanpa judul';
 const uid=()=>Date.now().toString(36)+crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
-const kind=f=>f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':(f.type==='application/pdf'||/\.pdf$/i.test(f.name))?'pdf':null;
+const isZip=f=>/\.(zip|cbz)$/i.test(f.name)||f.type==='application/zip'||f.type==='application/x-cbz';
+const kind=f=>f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':(f.type==='application/pdf'||/\.pdf$/i.test(f.name)||isZip(f))?'pdf':null;
 const canvasBlob=c=>new Promise(r=>c.toBlob(r,'image/jpeg',.72));
 const once=(el,ev)=>new Promise(r=>el.addEventListener(ev,r,{once:true}));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -236,9 +265,9 @@ async function thumbPdf(f){await loadPdfJs();const doc=await pdfjsLib.getDocumen
 async function addFiles(list){const files=[...list];let i=0,fail=0;
   for(const f of files){i++;const k=kind(f);if(!k){fail++;continue}
     try{toast(`Mengunci ${i}/${files.length}…`,60000);$('#bar').style.transform=`scaleX(${(i-1)/files.length})`;
-      const id=uid(),t=k==='image'?await thumbImage(f):k==='video'?await thumbVideo(f):await thumbPdf(f);
+      const id=uid(),t=k==='image'?await thumbImage(f):k==='video'?await thumbVideo(f):isZip(f)?await thumbZip(f):await thumbPdf(f);
       const chunks=[];for(let o=0;o<f.size;o+=CH)chunks.push(await seal(await f.slice(o,o+CH).arrayBuffer()));
-      const meta={title:t.title||clean(f.name),type:k,mime:f.type||'application/pdf',size:f.size,added:Date.now(),pages:t.pages||0};
+      const meta={title:t.title||clean(f.name),type:k,mime:(k==='pdf'&&isZip(f))?'application/zip':(f.type||'application/pdf'),size:f.size,added:Date.now(),pages:t.pages||0};
       await put('data',{id,chunks});
       await put('meta',{id,m:await sealJSON(meta),th:t.blob?await seal(await t.blob.arrayBuffer()):null});
     }catch(e){fail++;console.error(e)}}
@@ -260,40 +289,119 @@ function render(dx){const g=$('#grid'),list=items.filter(x=>tab==='all'||x.type=
     b.innerHTML=(it.th?'<img alt="" decoding="async" loading="lazy">':`<div class="ph">${ICON[it.type]}</div>`)+`<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`+
       (done?'<span class="bd dn">selesai</span>':fresh?'<span class="bd">baru</span>':'')+(pg&&!done?`<span class="pr" style="width:${Math.round(pg.p/pg.n*100)}%"></span>`:'');
     b.querySelector('em').textContent=it.title;const im=b.querySelector('img');if(im){im.onload=()=>im.classList.add('ld');im.src=it.th}
-    b.onclick=()=>{hap(8);openItem(it)};c.appendChild(b);fr.appendChild(c)});
+    cardEls[it.id]=b;b.onclick=()=>{hap(8);openItem(it,b)};c.appendChild(b);fr.appendChild(c)});
   g.appendChild(fr);stag=false;
   if(dx&&S.anim){g.style.setProperty('--dx',dx*30+'px');void g.offsetWidth;g.classList.add('sl')}}
 
 /* ---------- viewer ---------- */
-let cur=null,pdfDoc=null,io=null,pt=null,flushProg=null;
-async function readAll(id){const d=await get('data',id);const parts=[];for(const c of d.chunks)parts.push(await unseal(c));return parts}
-async function openItem(it){cur=it;$('#vt').textContent=it.title;$('#view').classList.remove('hide');const body=$('#vbody');body.textContent='';body.className='';body.scrollTop=0;
-  try{toast('Membuka…',1200);const parts=await readAll(it.id);
-    if(it.type==='pdf'){await loadPdfJs();const buf=new Uint8Array(parts.reduce((a,p)=>a+p.byteLength,0));let o=0;for(const p of parts){buf.set(new Uint8Array(p),o);o+=p.byteLength}
-      await readPdf(buf,body)}
-    else{curUrl=URL.createObjectURL(new Blob(parts,{type:it.mime}));body.className='center';
-      const el=document.createElement(it.type==='video'?'video':'img');el.src=curUrl;if(it.type==='video'){el.controls=true;el.playsInline=true;el.autoplay=true}body.appendChild(el)}
-  }catch(e){toast(e.message||'Gagal membuka',3500)}}
-async function readPdf(buf,body){pdfDoc=await pdfjsLib.getDocument({data:buf}).promise;const wrap=document.createElement('div');wrap.id='pages';body.appendChild(wrap);
-  const p1=await pdfDoc.getPage(1),v1=p1.getViewport({scale:1}),W=Math.min(body.clientWidth,S.pw==='mid'?680:900,S.pw==='fit'?body.clientHeight*v1.width/v1.height:9e9),dpr=Math.min(devicePixelRatio||1,2);wrap.style.width=W+'px';
-  io=new IntersectionObserver(es=>es.forEach(e=>{const d=e.target;if(e.isIntersecting)paint(d,W,dpr);else unpaint(d)}),{root:body,rootMargin:'700px 0px'});
-  for(let n=1;n<=pdfDoc.numPages;n++){const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=v1.width+'/'+v1.height;wrap.appendChild(d);io.observe(d)}
-  const id=cur.id,N=pdfDoc.numPages,pr=prog[id];
-  const calc=()=>{if(!wrap.isConnected)return;const h=wrap.children[0].offsetHeight+S.pgap;let p=Math.floor((body.scrollTop+body.clientHeight/3)/h)+1;if(body.scrollTop+body.clientHeight>=body.scrollHeight-24)p=N;p=Math.max(1,Math.min(N,p));prog[id]={p,n:N};sealJSON({p,n:N}).then(v=>put('cfg',{k:'prog:'+id,v}))};
-  body.onscroll=()=>{clearTimeout(pt);flushProg=calc;pt=setTimeout(()=>{calc();flushProg=null},400)};
-  if(pr&&pr.p>1&&pr.p<pr.n)requestAnimationFrame(()=>wrap.children[pr.p-1]&&wrap.children[pr.p-1].scrollIntoView())}
-async function paint(d,W,dpr){if(d.dataset.on||!pdfDoc)return;d.dataset.on=1;
-  try{const p=await pdfDoc.getPage(+d.dataset.n),b=p.getViewport({scale:1}),vp=p.getViewport({scale:W*dpr/b.width}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
-    await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;if(d.dataset.on){d.textContent='';d.appendChild(c)}}catch{delete d.dataset.on}}
-function unpaint(d){if(!d.dataset.on)return;delete d.dataset.on;d.textContent=''}
-function closeView(){clearTimeout(pt);if(flushProg){flushProg();flushProg=null}$('#view').classList.add('hide');$('#vbody').onscroll=null;$('#vbody').textContent='';if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}cur=null;if(items.length)render()}
-$('#vx').onclick=closeView;
-$('#vd').onclick=async()=>{if(!cur||!confirm('Hapus "'+cur.title+'" selamanya?'))return;const id=cur.id;closeView();await del('meta',id);await del('data',id);await load();toast('Dihapus')};
-$('#vr').onclick=async()=>{if(!cur)return;const t=prompt('Judul baru',cur.title);if(!t||!t.trim())return;const r=await get('meta',cur.id),m=await unsealJSON(r.m);m.title=t.trim();r.m=await sealJSON(m);await put('meta',r);cur.title=m.title;$('#vt').textContent=m.title;await load()};
+let cur=null,pdfDoc=null,io=null,pt=null,flushProg=null,zipU8=null,zipEnts=null,rd=null,hideT=null,an=null,reqId=0,dragMoved=false;
+const V={list:[],slide:false,tm:null},cardEls={},IMG=/\.(jpe?g|png|webp|gif|avif|bmp)$/i;
+const MIME={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',avif:'image/avif',bmp:'image/bmp'};
+const mimeOf=n=>MIME[n.split('.').pop().toLowerCase()]||'image/jpeg';
+const concat=ps=>{const b=new Uint8Array(ps.reduce((a,p)=>a+p.byteLength,0));let o=0;for(const p of ps){b.set(new Uint8Array(p),o);o+=p.byteLength}return b};
+const sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+async function readAll(id){const d=await get('data',id),parts=[];for(const c of d.chunks)parts.push(await unseal(c));return parts}
+
+/* ZIP / CBZ: pembaca sendiri (tanpa pustaka), isi didekompresi per halaman */
+function zipList(u8){const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);let e=u8.length-22;const min=Math.max(0,u8.length-65558);
+  for(;e>=min;e--)if(dv.getUint32(e,true)===0x06054b50)break;if(e<min)throw new Error('ZIP tidak valid');
+  const n=dv.getUint16(e+10,true);let o=dv.getUint32(e+16,true);const out=[];
+  for(let i=0;i<n&&dv.getUint32(o,true)===0x02014b50;i++){const m=dv.getUint16(o+10,true),cs=dv.getUint32(o+20,true),nl=dv.getUint16(o+28,true),el=dv.getUint16(o+30,true),cl=dv.getUint16(o+32,true),lo=dv.getUint32(o+42,true),name=td.decode(u8.subarray(o+46,o+46+nl));
+    if(IMG.test(name)&&!/(^|\/)(__MACOSX|\.)/.test(name))out.push({name,m,cs,lo});o+=46+nl+el+cl}
+  if(!out.length)throw new Error('Tidak ada gambar di dalam ZIP');return out.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}))}
+async function zipData(u8,en){const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),st=en.lo+30+dv.getUint16(en.lo+26,true)+dv.getUint16(en.lo+28,true),raw=u8.subarray(st,st+en.cs);
+  if(en.m===0)return raw;if(en.m!==8||typeof DecompressionStream==='undefined')throw new Error('ZIP ini belum didukung browsermu');
+  return new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer())}
+async function thumbZip(f){const u8=new Uint8Array(await f.arrayBuffer()),l=zipList(u8),d=await zipData(u8,l[0]),bm=await createImageBitmap(new Blob([d],{type:mimeOf(l[0].name)})),c=drawThumb(bm,bm.width,bm.height);bm.close();return {blob:await canvasBlob(c),pages:l.length}}
+
+/* chrome (bilah) yang menghilang sendiri */
+function showChrome(){const v=$('#view');v.classList.remove('hid');clearTimeout(hideT);hideT=setTimeout(()=>{if(!$('#sheet'))v.classList.add('hid')},3200)}
+function hideChrome(){clearTimeout(hideT);$('#view').classList.add('hid')}
+const clipFor=r=>`inset(${r.top}px ${innerWidth-r.right}px ${innerHeight-r.bottom}px ${r.left}px round 16px)`;
+function cleanup(){clearTimeout(V.tm);clearTimeout(pt);if(flushProg){flushProg();flushProg=null}const b=$('#vbody');b.onscroll=null;b.textContent='';
+  if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}zipU8=zipEnts=rd=null;if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}}
+const mediaList=it=>{let l=items.filter(x=>x.type!=='pdf'&&(tab==='all'||tab==='pdf'||x.type===tab));return l.some(x=>x.id===it.id)?l:items.filter(x=>x.type!=='pdf')};
+function step(d){const l=V.list;if(l.length<2||!cur)return;hap(6);openItem(l[(l.findIndex(x=>x.id===cur.id)+d+l.length)%l.length],null,d)}
+function slideTick(){clearTimeout(V.tm);if(V.slide&&cur&&cur.type==='image')V.tm=setTimeout(()=>step(1),S.ssd*1000)}
+
+async function openItem(it,src,dir){const my=++reqId,v=$('#view'),body=$('#vbody'),fresh=v.classList.contains('hide'),med=it.type!=='pdf';
+  cleanup();cur=it;
+  if(fresh){v.classList.remove('hide');if(src&&S.anim)v.animate([{clipPath:clipFor(src.getBoundingClientRect())},{clipPath:'inset(0px round 0px)'}],{duration:340,easing:'cubic-bezier(.2,.8,.2,1)'})}
+  V.list=med?mediaList(it):[];const multi=med&&V.list.length>1;
+  v.classList.toggle('med',med);v.classList.toggle('cm',!med);$('#vt').textContent=it.title;$('#vblur').style.backgroundImage=it.th?`url(${it.th})`:'none';
+  $('#vs').classList.toggle('hide',!multi);$('#vs').textContent=V.slide?'Jeda':'Slideshow';['#nvp','#nvn'].forEach(x=>$(x).classList.toggle('hide',!multi));
+  const pos=$('#pos');pos.classList.toggle('hide',!multi);if(multi)pos.textContent=(V.list.findIndex(x=>x.id===it.id)+1)+' / '+V.list.length;
+  body.className='center';body.scrollTop=0;
+  if(it.th){const st=document.createElement('div');st.id='stage';const im=new Image();im.src=it.th;im.className='pre';st.appendChild(im);body.appendChild(st)}
+  showChrome();
+  try{const parts=await readAll(it.id);if(my!==reqId)return;body.textContent='';
+    if(!med){body.className='';const buf=concat(parts);
+      if(it.mime==='application/zip'){zipU8=buf;zipEnts=zipList(buf);const u=await zipData(buf,zipEnts[0]),bm=await createImageBitmap(new Blob([u],{type:mimeOf(zipEnts[0].name)})),ratio=bm.width/bm.height;bm.close();if(my!==reqId)return;startReader(body,zipEnts.length,ratio,zipPaint)}
+      else{await loadPdfJs();const doc=await pdfjsLib.getDocument({data:buf}).promise;if(my!==reqId){doc.destroy();return}pdfDoc=doc;const vp=(await doc.getPage(1)).getViewport({scale:1});startReader(body,doc.numPages,vp.width/vp.height,pdfPaint)}}
+    else{curUrl=URL.createObjectURL(new Blob(parts,{type:it.mime}));const st=document.createElement('div');st.id='stage';const el=document.createElement(it.type==='video'?'video':'img');el.src=curUrl;
+      if(it.type==='video'){el.controls=true;el.playsInline=true;el.autoplay=true;el.onended=()=>{if(V.slide)step(1)}}else{el.draggable=false;el.onload=slideTick}
+      st.appendChild(el);body.appendChild(st);if(dir&&S.anim)st.animate([{transform:`translateX(${dir*40}%)`,opacity:0},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})}
+  }catch(e){if(my===reqId)toast(e.message||'Gagal membuka',3500)}}
+
+/* pembaca komik (PDF & ZIP) */
+const pdfPaint=async(d,n,W,dpr)=>{const p=await pdfDoc.getPage(n),b=p.getViewport({scale:1}),vp=p.getViewport({scale:W*dpr/b.width}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+  await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;if(d.dataset.on){d.textContent='';d.appendChild(c)}};
+const zipPaint=async(d,n)=>{const en=zipEnts[n-1],u=await zipData(zipU8,en);if(!d.dataset.on)return;const im=new Image();im.decoding='async';im.onload=()=>{d.style.aspectRatio=im.naturalWidth+'/'+im.naturalHeight};
+  im.src=URL.createObjectURL(new Blob([u],{type:mimeOf(en.name)}));d.textContent='';d.appendChild(im)};
+async function paint(d){if(d.dataset.on||!rd)return;d.dataset.on=1;try{await rd.paint(d,+d.dataset.n,rd.W,rd.dpr)}catch{delete d.dataset.on}}
+function unpaint(d){if(!d.dataset.on)return;delete d.dataset.on;const im=d.firstChild;if(im&&im.tagName==='IMG')URL.revokeObjectURL(im.src);d.textContent=''}
+function startReader(body,N,ratio,painter){const wrap=document.createElement('div');wrap.id='pages';body.appendChild(wrap);
+  const W=Math.min(body.clientWidth,S.pw==='mid'?680:900,S.pw==='fit'?body.clientHeight*ratio:9e9),dpr=Math.min(devicePixelRatio||1,2);wrap.style.width=W+'px';
+  rd={W,dpr,paint:painter};io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?paint(e.target):unpaint(e.target)),{root:body,rootMargin:'700px 0px'});
+  for(let n=1;n<=N;n++){const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=ratio;wrap.appendChild(d);io.observe(d)}
+  wrap.children[0].style.marginTop='calc(env(safe-area-inset-top,0px) + 54px)';wrap.appendChild(endPanel());
+  const id=cur.id,pr=prog[id],pos=$('#pos'),c=wrap.children;
+  const pageNow=()=>{const y=body.scrollTop+body.clientHeight/3;let lo=0,hi=N-1;while(lo<hi){const m=(lo+hi+1)>>1;if(c[m].offsetTop<=y)lo=m;else hi=m-1}return lo+1};
+  const calc=()=>{if(!wrap.isConnected||!KEY)return;const p=pageNow();prog[id]={p,n:N};sealJSON({p,n:N}).then(x=>put('cfg',{k:'prog:'+id,v:x}))};
+  let raf=0;body.onscroll=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;pos.textContent=pageNow()+' / '+N});clearTimeout(pt);flushProg=calc;pt=setTimeout(()=>{calc();flushProg=null},400)};
+  pos.classList.remove('hide');pos.textContent='1 / '+N;
+  if(pr&&pr.p>1&&pr.p<pr.n)requestAnimationFrame(()=>{c[pr.p-1]&&c[pr.p-1].scrollIntoView();pos.textContent=pr.p+' / '+N})}
+const rcard=it=>{const b=document.createElement('button');b.className='rc';b.innerHTML=(it.th?`<img alt="" src="${it.th}">`:`<div class="ph">${ICON[it.type]}</div>`)+'<span></span>';b.lastChild.textContent=(it.type==='video'?'▶ ':'')+it.title;b.onclick=()=>{hap(8);openItem(it)};return b};
+function endPanel(){const nat=(a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true}),key=t=>t.replace(/[\s_\-.]*(?:chapter|ch|volume|vol|bab|episode|ep|#)?[\s.]*\d+.*$/i,'').trim().toLowerCase(),
+    cs=items.filter(x=>x.type==='pdf'&&x.id!==cur.id),k=key(cur.title),nx=k?cs.filter(x=>key(x.title)===k&&nat(x,cur)>0).sort(nat):[],
+    rd1=[...new Set([...nx,...cs.filter(x=>prog[x.id]&&prog[x.id].p<prog[x.id].n),...sh(cs.filter(x=>!prog[x.id]))])].slice(0,10),vids=sh(items.filter(x=>x.type==='video')).slice(0,10);
+  const d=document.createElement('div');d.id='endp';d.innerHTML='<h2>Selesai</h2><p></p><button class="eb" id="e1">Baca lagi</button><button class="eb" id="e2">Tutup</button>'+(rd1.length?'<h4>Lanjut baca</h4><div class="rrow" id="rr"></div>':'')+(vids.length?'<h4>Tonton selanjutnya</h4><div class="rrow" id="rv"></div>':'');
+  d.querySelector('p').textContent=cur.title;rd1.forEach(x=>d.querySelector('#rr').appendChild(rcard(x)));vids.forEach(x=>d.querySelector('#rv').appendChild(rcard(x)));
+  d.querySelector('#e1').onclick=()=>{hap(8);$('#vbody').scrollTo({top:0,behavior:'smooth'})};d.querySelector('#e2').onclick=()=>closeView();return d}
+
+/* tutup dengan animasi balik ke kartu */
+function closeView(sw,now){const v=$('#view');if(v.classList.contains('hide'))return;clearTimeout(pt);if(flushProg){flushProg();flushProg=null}V.slide=false;clearTimeout(V.tm);reqId++;
+  const fin=()=>{if(an){an.onfinish=an.oncancel=null;an.cancel();an=null}v.classList.add('hide');v.style.cssText='';cleanup();cur=null;render()};
+  if(now||!S.anim)return fin();
+  const src=cardEls[cur.id],r=src&&src.isConnected?src.getBoundingClientRect():null,cs=getComputedStyle(v),o=cs.opacity,t=cs.transform;
+  an=(!sw&&r&&r.bottom>0&&r.top<innerHeight)?v.animate([{clipPath:'inset(0px round 0px)'},{clipPath:clipFor(r)}],{duration:300,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'})
+    :v.animate([{opacity:o,transform:t},{opacity:0,transform:'translateY(70%) scale(.88)'}],{duration:240,easing:'ease-in',fill:'forwards'});
+  an.onfinish=fin;an.oncancel=fin}
+
+/* gestur: geser kiri/kanan = foto berikutnya, tarik ke bawah = tutup, ketuk = tampil/sembunyi bilah */
+(()=>{const body=$('#vbody'),v=$('#view');let g=null;
+  const snap=el=>{if(!el)return;el.style.transition='transform .26s cubic-bezier(.2,.8,.2,1),opacity .26s';el.style.transform='';el.style.opacity='';setTimeout(()=>el.style.transition='',300)};
+  body.addEventListener('pointerdown',e=>{dragMoved=false;if(!body.classList.contains('center')||!$('#stage'))return;if(e.target.tagName==='VIDEO'&&e.clientY>e.target.getBoundingClientRect().bottom-80)return;g={x:e.clientX,y:e.clientY,t:performance.now(),ax:0,dx:0,dy:0,id:e.pointerId}});
+  body.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')showChrome();if(!g||e.pointerId!==g.id)return;g.dx=e.clientX-g.x;g.dy=e.clientY-g.y;
+    if(!g.ax){if(Math.abs(g.dx)<9&&Math.abs(g.dy)<9)return;g.ax=Math.abs(g.dx)>Math.abs(g.dy)?'x':'y';dragMoved=true;try{body.setPointerCapture(e.pointerId)}catch{}}
+    const st=$('#stage');if(g.ax==='x'&&V.list.length>1&&st)st.style.transform=`translateX(${g.dx}px)`;
+    else if(g.ax==='y'&&g.dy>0){const k=Math.min(g.dy/420,1);v.style.transform=`translateY(${g.dy}px) scale(${1-k*.1})`;v.style.opacity=1-k*.55}});
+  body.addEventListener('pointerup',()=>{if(!g)return;const d=g;g=null;if(!d.ax)return;const dt=Math.max(1,performance.now()-d.t);
+    if(d.ax==='x'&&V.list.length>1){if(Math.abs(d.dx)>70||Math.abs(d.dx)/dt>.45)step(d.dx<0?1:-1);else snap($('#stage'))}
+    else if(d.ax==='y'){if(d.dy>110||(d.dy>40&&d.dy/dt>.6))closeView(true);else snap(v)}});
+  body.addEventListener('pointercancel',()=>{if(g){g=null;snap($('#stage'));snap(v)}});
+  body.addEventListener('click',e=>{if(dragMoved){dragMoved=false;return}if(e.target.closest('button,.rc,video,#endp'))return;v.classList.contains('hid')?showChrome():hideChrome()});
+  document.addEventListener('keydown',e=>{if(v.classList.contains('hide')||$('#sheet'))return;if(e.key==='Escape')closeView();else if(e.key==='ArrowRight')step(1);else if(e.key==='ArrowLeft')step(-1)})})();
+$('#vx').onclick=()=>{hap(6);closeView()};$('#nvp').onclick=()=>step(-1);$('#nvn').onclick=()=>step(1);
+$('#vs').onclick=()=>{V.slide=!V.slide;hap(8);$('#vs').textContent=V.slide?'Jeda':'Slideshow';clearTimeout(V.tm);if(V.slide){showChrome();if(cur.type==='image')slideTick();else{const x=$('#vbody video');x&&x.play()}}};
+$('#vd').onclick=async()=>{if(!cur||!confirm('Hapus "'+cur.title+'" selamanya?'))return;const id=cur.id,med=cur.type!=='pdf',l=V.list,i=l.findIndex(x=>x.id===id);hap([20,30,20]);
+  await del('meta',id);await del('data',id);try{await del('cfg','prog:'+id)}catch{}delete prog[id];items=items.filter(x=>x.id!==id);V.list=l.filter(x=>x.id!==id);
+  if(med&&V.list.length)openItem(V.list[Math.min(i,V.list.length-1)],null,1);else closeView();render();toast('Dihapus')};
+$('#vr').onclick=async()=>{if(!cur)return;const t=prompt('Judul baru',cur.title);if(!t||!t.trim())return;const r=await get('meta',cur.id),m=await unsealJSON(r.m);m.title=t.trim();r.m=await sealJSON(m);await put('meta',r);cur.title=m.title;$('#vt').textContent=m.title;render()};
 
 /* ---------- tab, tambah ---------- */
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const o=[...$('#tabs').children],n=o.indexOf(b),p=o.findIndex(x=>x.classList.contains('on'));if(n===p)return;hap(6);tab=b.dataset.t;o.forEach(x=>x.classList.toggle('on',x===b));render(n>p?1:-1)};
-$('#add').onclick=()=>{hap(10);S.fab==='menu'?sheetAdd():pick('image/*,video/*,application/pdf,.pdf')};
+$('#add').onclick=()=>{hap(10);S.fab==='menu'?sheetAdd():pick('image/*,video/*,application/pdf,.pdf,.zip,.cbz,application/zip')};
 $('#setbtn').onclick=()=>{hap(8);openSettings()};
 $('#file').onchange=e=>{const l=[...e.target.files];e.target.value='';if(l.length)addFiles(l)};
 
@@ -310,7 +418,7 @@ $('#lf').onsubmit=async e=>{e.preventDefault();const pw=$('#pw').value;if(pw.len
     else{const k=await derive(pw,new Uint8Array(auth.salt));KEY=k;try{await unseal(auth.check)}catch{KEY=null;$('#lmsg').textContent='Salah';$('#pw').classList.remove('shake');void $('#pw').offsetWidth;$('#pw').classList.add('shake');hap([30,40,30]);$('#pw').value='';return}}
     $('#pw').value=$('#pw2').value='';$('#lock').classList.add('hide');$('#app').classList.remove('hide');await load()}
   finally{$('#lgo').disabled=false}};
-function lockNow(){KEY=null;items=[];closeSheet();urls.forEach(URL.revokeObjectURL);urls=[];closeView();$('#grid').textContent='';$('#app').classList.add('hide');
+function lockNow(){KEY=null;items=[];closeSheet();urls.forEach(URL.revokeObjectURL);urls=[];closeView(0,1);$('#grid').textContent='';$('#app').classList.add('hide');
   $('#lf').classList.add('hide');$('#nf').classList.remove('hide');$('#lock').classList.remove('hide');taps=0}
 function lock(a){KEY=null;if(a&&S.anim&&!$('#app').classList.contains('hide')){$('#app').classList.add('closing');setTimeout(()=>{lockNow();$('#app').classList.remove('closing')},260)}else lockNow()}
 $('#lockbtn').onclick=()=>{hap(12);lock(true)};

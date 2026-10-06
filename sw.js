@@ -1,4 +1,4 @@
-const V='v2',PDF='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+const V='v3',PDF='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 const SHELL=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png',PDF+'pdf.min.js',PDF+'pdf.worker.min.js'];
 const keep=(r,x)=>{if(x.ok){const c=x.clone();caches.open(V).then(k=>k.put(r,c))}return x};
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>Promise.all(SHELL.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))).then(()=>self.skipWaiting()))});
