@@ -70,7 +70,7 @@ body[data-cs=sharp]{--r:4px}body[data-cs=flat]{--r:0px;--gap:2px}
 .cell{position:relative}.card{width:100%;display:block}
 .cell.in{animation:cin .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*24ms)}
 @keyframes cin{from{opacity:0;transform:translateY(14px)}}
-.grid.sl{animation:sl .32s cubic-bezier(.2,.8,.2,1)}
+#grid.sl{animation:sl .32s cubic-bezier(.2,.8,.2,1)}
 @keyframes sl{from{opacity:0;transform:translateX(var(--dx,0))}}
 .card .pr{position:absolute;left:0;bottom:0;height:3px;background:var(--ac);z-index:1;border-radius:0 3px 3px 0}
 .card .bd{position:absolute;top:8px;left:8px;z-index:1;background:var(--ac);color:#0a1411;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
@@ -128,6 +128,41 @@ body[data-vbg=b] #vblur{display:block}
 .rc span{position:absolute;left:0;right:0;bottom:0;padding:20px 7px 6px;font-size:11px;line-height:1.2;background:linear-gradient(transparent,rgba(8,10,12,.92));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 body.noanim *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* kategori, pilih banyak, folder tersembunyi */
+body.hm{--ac:#c2b2ff;--ac2:#2c2742}
+#hbk{color:var(--ac);padding:4px 0 4px 14px;font-size:13px}
+.chips{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none}
+.chips button{padding:5px 12px;border-radius:99px;border:1px solid var(--s2);color:var(--mu);font-size:13px;white-space:nowrap;flex:none}
+.chips button.on{border-color:var(--ac);color:var(--ac);background:var(--ac2)}
+.chips small{opacity:.65;margin-left:5px;font-size:11px}
+.sec{margin:4px 0 26px}
+.sh{display:flex;align-items:baseline;gap:9px;width:100%;padding:12px 2px 9px;margin-bottom:10px;text-align:left;border-bottom:1px solid var(--s2)}
+.sh b{font-size:18px;font-weight:600;letter-spacing:-.3px}
+.sh small{color:var(--mu);font-size:12px;margin-left:auto;white-space:nowrap}
+.sh .ch{color:var(--ac);font-size:13px;display:inline-block;transition:transform .2s}
+.sec.cl .grid,.sec.cl .sub{display:none}
+.sec.cl .ch{transform:rotate(-90deg)}
+.sec.cl .sh{margin-bottom:0}
+.sub{color:var(--mu);font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin:16px 2px 9px;display:flex;align-items:center;gap:10px}
+.sub::after{content:"";flex:1;height:1px;background:var(--s2)}
+.sh+.sub{margin-top:2px}
+.card{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.card img{pointer-events:none}
+.card .ck{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(10,12,14,.55);border:2px solid rgba(255,255,255,.7);display:none;place-items:center;font-size:14px;color:#0a1411;z-index:2;font-weight:700}
+body.sm .card .ck{display:grid}
+.card.sel .ck{background:var(--ac);border-color:var(--ac)}
+.card.sel{outline:3px solid var(--ac);outline-offset:-3px}
+body.sm #add{display:none}
+#selbar{position:fixed;left:12px;right:12px;bottom:calc(14px + var(--safe-b));z-index:7;background:var(--s2);border-radius:18px;padding:7px 8px;display:flex;align-items:center;gap:2px;box-shadow:0 8px 30px rgba(0,0,0,.55);overflow-x:auto;scrollbar-width:none}
+#selbar span{flex:1;font-size:15px;font-weight:600;color:var(--ac);padding-left:10px;min-width:24px}
+#selbar button{padding:9px 11px;border-radius:10px;font-size:13px;white-space:nowrap}
+.dg{color:var(--danger)}
+.crow button{padding:4px 9px;color:var(--mu)}
+.crow .dg{color:var(--danger)}
+.pn input.pin{display:block;width:100%;margin-top:8px;padding:13px;border-radius:12px;background:var(--s2);border:1px solid transparent;outline:none;text-align:center;letter-spacing:6px;font-size:18px}
+.pn input.pin:focus{border-color:var(--ac)}
+.pn .ctr{text-align:center}
 </style></head><body>
 <div class="bar" id="bar"></div>
 
@@ -143,30 +178,34 @@ body.noanim *{animation:none!important;transition:none!important}
 
 <div id="app" class="hide">
   <header>
-    <div class="top"><b id="ttl">Koleksi</b><div><span id="cnt"></span><button id="setbtn">Atur</button><button id="lockbtn">Kunci</button></div></div>
+    <div class="top"><b id="ttl">Koleksi</b><div><span id="cnt"></span><button id="hbk" class="hide">‹ Keluar</button><button id="setbtn">Atur</button><button id="lockbtn">Kunci</button></div></div>
     <div class="tabs" id="tabs">
       <button data-t="all" class="on">Semua</button><button data-t="image">Foto</button><button data-t="video">Video</button><button data-t="pdf">Komik</button>
     </div>
+    <div class="chips hide" id="chips"></div>
   </header>
-  <main><div class="grid" id="grid"></div><div class="empty hide" id="empty"><b>Masih kosong</b>Tekan + untuk menambah foto, video, atau PDF komik.</div></main>
+  <main><div id="grid"></div><div class="empty hide" id="empty"><b>Masih kosong</b>Tekan + untuk menambah foto, video, atau PDF komik.</div></main>
   <button id="add" aria-label="Tambah">+</button>
+  <div id="selbar" class="hide"><span id="selc"></span><button data-a="all">Semua</button><button data-a="cat">Kategori</button><button data-a="hid" id="selh">Sembunyikan</button><button data-a="del" class="dg">Hapus</button><button data-a="x">Batal</button></div>
   <input id="file" type="file" multiple accept="image/*,video/*,application/pdf,.pdf,.zip,.cbz,application/zip" class="hide">
 </div>
 
 <div id="view" class="hide"><div id="vblur"></div><div id="vbody"></div>
-  <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vs" class="hide">Slideshow</button><button id="vr">Judul</button><button class="del" id="vd">Hapus</button></div>
+  <div id="vbar"><button class="x" id="vx">✕</button><h2 id="vt"></h2><button id="vs" class="hide">Slideshow</button><button id="vr">Edit</button><button class="del" id="vd">Hapus</button></div>
   <button class="nv hide" id="nvp">‹</button><button class="nv hide" id="nvn">›</button><div id="pos"></div>
 </div>
 <input id="bfile" type="file" class="hide">
+<input id="cfile" type="file" accept="image/*" class="hide">
 <div id="toast"></div>
 
 <script>
 'use strict';
 const $=s=>document.querySelector(s), CH=2*1024*1024, PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 const te=new TextEncoder(), td=new TextDecoder();
-let KEY=null, items=[], tab='all', urls=[], curUrl=null, hideTimer=null;
+let KEY=null, items=[], tab='all', urls=[], curUrl=null, hideTimer=null, hm=false, catF=null, sel=null, shown=[], CATS={n:[],h:[]}, picking=0;
+const collapsed=new Set();
 /* ---------- pengaturan tampilan ---------- */
-let S={vw:'grid',gs:'m',cs:'round',fab:'right',pw:'full',pgap:0,hap:1,anim:1,vbg:'k',ssd:5};
+let S={vw:'grid',gs:'m',cs:'round',fab:'right',pw:'full',pgap:0,hap:1,anim:1,vbg:'k',ssd:5,grp:'cat'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('ui')||'{}'))}catch{}
 const saveS=()=>{try{localStorage.setItem('ui',JSON.stringify(S))}catch{}};
 function applyS(){const b=document.body;b.dataset.cs=S.cs;b.dataset.fab=S.fab;b.dataset.vbg=S.vbg;b.classList.toggle('list',S.vw==='list');b.classList.toggle('rak',S.vw==='rak');b.classList.toggle('noanim',!S.anim);
@@ -177,7 +216,7 @@ const fmt=n=>n>=1e9?(n/1e9).toFixed(2)+' GB':n>=1e6?(n/1e6).toFixed(1)+' MB':Mat
 const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function sheet(html,bind){closeSheet();const s=document.createElement('div');s.id='sheet';s.innerHTML='<div class="pn">'+html+'</div>';s.onclick=e=>{if(e.target===s)closeSheet()};document.body.appendChild(s);bind&&bind(s.firstChild)}
 function closeSheet(){const s=$('#sheet');s&&s.remove()}
-const pick=a=>{const f=$('#file');f.accept=a;f.click()};
+const pick=a=>{picking=Date.now();const f=$('#file');f.accept=a;f.click()};
 function sheetAdd(){sheet('<h3>Tambah</h3><button class="big" data-a="image/*">Foto</button><button class="big" data-a="video/*">Video</button><button class="big" data-a="application/pdf,.pdf,.zip,.cbz,application/zip">Komik (PDF / ZIP)</button>',
   pn=>pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(8);closeSheet();pick(b.dataset.a)})}
 function openSettings(){
@@ -185,19 +224,22 @@ function openSettings(){
   sheet(`<h3>Tampilan</h3>${seg('vw',[['grid','Grid'],['list','Daftar'],['rak','Rak buku']])}
 <h3>Ukuran grid</h3>${seg('gs',[['s','Kecil'],['m','Sedang'],['l','Besar']])}
 <h3>Gaya kartu</h3>${seg('cs',[['round','Bulat'],['sharp','Tajam'],['flat','Rapat']])}
+<h3>Pengelompokan</h3>${seg('grp',[['cat','Per kategori'],['none','Tanpa kelompok']])}
 <h3>Tombol tambah</h3>${seg('fab',[['right','Kanan'],['center','Tengah'],['menu','Menu']])}
 <h3>Latar viewer</h3>${seg('vbg',[['k','Hitam'],['g','Abu gelap'],['b','Blur foto']])}
 <h3>Slideshow</h3>${seg('ssd',[[3,'3 detik'],[5,'5 detik'],[8,'8 detik']])}
 <h3>Pembaca komik</h3>${seg('pw',[['full','Lebar penuh'],['mid','Sedang'],['fit','Pas layar']])}${seg('pgap',[[0,'Tanpa jarak'],[8,'Jarak kecil'],[20,'Jarak besar']])}
 <h3>Efek</h3>${seg('hap',[[1,'Getar aktif'],[0,'Getar mati']])}${seg('anim',[[1,'Animasi'],[0,'Tanpa animasi']])}
+<h3>Kategori & thumbnail</h3><button class="big" id="mc">Kelola kategori</button><button class="big" id="fx">Perbaiki thumbnail video yang hitam</button>
+<h3>Folder tersembunyi</h3><button class="big" id="oh">${hm?'Sedang di folder tersembunyi':'Buka folder tersembunyi'}</button><button class="big" id="rp">Reset PIN (perlu kata sandi utama)</button>
 <h3>Penyimpanan</h3><div id="stor">Menghitung…</div>
 <h3>Cadangan</h3><button class="big" id="bk">Ekspor cadangan terenkripsi</button><button class="big" id="bi">Impor cadangan</button>`,pn=>{
     pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(6);
-      if(b.dataset.k){const k=b.dataset.k,v=b.dataset.v;S[k]=isNaN(v)?v:+v;saveS();applyS();[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x===b));if(['vw','gs','cs'].includes(k))render()}
-      else if(b.id==='bk'){closeSheet();exportBackup()}else if(b.id==='bi')$('#bfile').click()};
-    (async()=>{const st=navigator.storage,e=st&&st.estimate?await st.estimate():{},per=st&&st.persisted?await st.persisted():false,tot=items.reduce((a,x)=>a+x.size,0),
-      big=[...items].sort((a,b)=>b.size-a.size).slice(0,3),q=e.quota||0,u=e.usage||0,el=pn.querySelector('#stor');if(!el)return;
-      el.innerHTML=`${fmt(tot)} terkunci, ${items.length} item<div class="bar2"><i style="width:${q?Math.max(1,u/q*100):0}%"></i></div><small>Terpakai ${fmt(u)} dari ${fmt(q)}. ${per?'Penyimpanan permanen.':'Browser bisa menghapus jika memori penuh.'}</small>`+big.map(x=>`<div class="row"><span>${esc(x.title)}</span><span>${fmt(x.size)}</span></div>`).join('')})()})}
+      if(b.dataset.k){const k=b.dataset.k,v=b.dataset.v;S[k]=isNaN(v)?v:+v;saveS();applyS();[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x===b));if(['vw','gs','cs','grp'].includes(k))render()}
+      else if(b.id==='bk'){closeSheet();exportBackup()}else if(b.id==='bi')$('#bfile').click();else if(b.id==='mc')manageCats();else if(b.id==='fx'){closeSheet();fixDark()}else if(b.id==='oh'){closeSheet();if(!hm)openHidden()}else if(b.id==='rp'){closeSheet();resetPin()}};
+    (async()=>{const st=navigator.storage,e=st&&st.estimate?await st.estimate():{},per=st&&st.persisted?await st.persisted():false,tot=vis().reduce((a,x)=>a+x.size,0),
+      big=[...vis()].sort((a,b)=>b.size-a.size).slice(0,3),q=e.quota||0,u=e.usage||0,el=pn.querySelector('#stor');if(!el)return;
+      el.innerHTML=`${fmt(tot)} terkunci, ${vis().length} item<div class="bar2"><i style="width:${q?Math.max(1,u/q*100):0}%"></i></div><small>Terpakai ${fmt(u)} dari ${fmt(q)}. ${per?'Penyimpanan permanen.':'Browser bisa menghapus jika memori penuh.'}</small>`+big.map(x=>`<div class="row"><span>${esc(x.title)}</span><span>${fmt(x.size)}</span></div>`).join('')})()})}
 
 /* ---------- cadangan terenkripsi (.vault) ---------- */
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n);return b};
@@ -205,7 +247,7 @@ const rec=(h,bufs)=>{const hb=te.encode(JSON.stringify({...h,l:bufs.map(b=>b.byt
 const eq=(a,b)=>{a=new Uint8Array(a);b=new Uint8Array(b);return a.length===b.length&&a.every((x,i)=>x===b[i])};
 async function exportBackup(){try{toast('Menyiapkan cadangan…',60000);const auth=await get('cfg','auth'),parts=[te.encode('VLT1'),rec({t:'auth'},[auth.salt,auth.check])];
     for(const r of await all('meta')){const d=await get('data',r.id);if(d)parts.push(rec({t:'data',id:r.id},d.chunks));parts.push(rec({t:'meta',id:r.id},r.th?[r.m,r.th]:[r.m]))}
-    for(const r of await all('cfg'))if(r.k.startsWith('prog:'))parts.push(rec({t:'prog',id:r.k.slice(5)},[r.v]));
+    for(const r of await all('cfg')){if(r.k.startsWith('prog:'))parts.push(rec({t:'prog',id:r.k.slice(5)},[r.v]));else if(r.k==='cats'||r.k==='hpin')parts.push(rec({t:'cfg',k:r.k},[r.v]))}
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(parts));a.download='notes-'+new Date().toISOString().slice(0,10)+'.vault';document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href),60000);toast('Cadangan dibuat. Isinya tetap terenkripsi.',3800)}catch(e){console.error(e);toast('Gagal membuat cadangan',3000)}}
 async function importBackup(file){try{toast('Membaca cadangan…',60000);if(td.decode(await file.slice(0,4).arrayBuffer())!=='VLT1')throw new Error('Bukan file cadangan');
@@ -216,7 +258,8 @@ async function importBackup(file){try{toast('Membaca cadangan…',60000);if(td.d
       if(h.t==='auth'){if(!eq(bufs[0],cur.salt)){const pw=prompt('Kata sandi untuk cadangan ini:');if(!pw)return toast('Dibatalkan');k2=await derive(pw,new Uint8Array(bufs[0]));try{await unseal(bufs[1],k2)}catch{return toast('Kata sandi cadangan salah',3000)}}}
       else if(h.t==='data'){if(have.has(h.id)){skip.add(h.id);continue}const ch=[];for(const b of bufs)ch.push(await rs(b));await put('data',{id:h.id,chunks:ch})}
       else if(h.t==='meta'){if(skip.has(h.id)||have.has(h.id))continue;await put('meta',{id:h.id,m:await rs(bufs[0]),th:bufs[1]?await rs(bufs[1]):null});n++}
-      else if(h.t==='prog'){if(!(await get('cfg','prog:'+h.id)))await put('cfg',{k:'prog:'+h.id,v:await rs(bufs[0])})}}
+      else if(h.t==='prog'){if(!(await get('cfg','prog:'+h.id)))await put('cfg',{k:'prog:'+h.id,v:await rs(bufs[0])})}
+      else if(h.t==='cfg'){if(!(await get('cfg',h.k)))await put('cfg',{k:h.k,v:await rs(bufs[0])})}}
     await load();toast(n+' item dipulihkan',3000)}catch(e){console.error(e);toast('Gagal impor: '+(e.message||'file rusak'),3500)}}
 $('#bfile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f){closeSheet();importBackup(f)}};
 
@@ -247,14 +290,22 @@ const once=(el,ev)=>new Promise(r=>el.addEventListener(ev,r,{once:true}));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve();return new Promise((res,rej)=>{const s=document.createElement('script');s.src=PDFJS+'pdf.min.js';
   s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';res()};s.onerror=()=>rej(new Error('pdf.js belum ter-cache, buka sekali saat online'));document.head.appendChild(s)})}
-function drawThumb(src,w,h){const c=document.createElement('canvas'),W=420,sc=W/w;c.width=W;c.height=Math.round(h*sc);c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c}
+function drawThumb(src,w,h){const c=document.createElement('canvas'),W=420,sc=W/w;c.width=W;c.height=Math.round(h*sc);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0,c.width,c.height);return c}
 
 /* ---------- thumbnails (hanya sampul / frame pertama) ---------- */
 async function thumbImage(f){try{const b=await createImageBitmap(f);const c=drawThumb(b,b.width,b.height);b.close();return {blob:await canvasBlob(c)}}catch{return {}}}
-async function thumbVideo(f){const u=URL.createObjectURL(f),v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='metadata';v.src=u;
-  try{await Promise.race([once(v,'loadeddata'),sleep(8000).then(()=>{throw 0})]);v.currentTime=Math.min(1,(v.duration||2)/10);
-    await Promise.race([once(v,'seeked'),sleep(4000)]);const c=drawThumb(v,v.videoWidth,v.videoHeight);return {blob:await canvasBlob(c)}}
-  catch{return {}}finally{URL.revokeObjectURL(u);v.removeAttribute('src');v.load()}}
+function lum(c){const t=document.createElement('canvas');t.width=t.height=24;const x=t.getContext('2d',{willReadFrequently:true});x.drawImage(c,0,0,24,24);const d=x.getImageData(0,0,24,24).data;let q=0;for(let i=0;i<d.length;i+=4)q+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;return q/576}
+async function seekTo(v,t){if(Math.abs(v.currentTime-t)<.01){await sleep(150);return}v.currentTime=t;await Promise.race([once(v,'seeked'),sleep(3000)]);
+  if(v.requestVideoFrameCallback)await Promise.race([new Promise(r=>v.requestVideoFrameCallback(r)),sleep(260)]);else await sleep(150)}
+/* cari frame yang tidak hitam: coba beberapa titik, pilih yang pertama cukup terang (atau yang paling terang) */
+async function thumbVideoUrl(url){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='auto';
+  v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none';const ready=once(v,'loadeddata');v.src=url;document.body.appendChild(v);
+  try{await Promise.race([ready,sleep(8000).then(()=>{throw 0})]);if(!v.videoWidth)throw 0;const d=isFinite(v.duration)?v.duration:0,
+      pts=[.1,.3,.5,.7,.2,.4,.6,.8,.05].map(p=>d?d*p:.5);let best=null,bl=-1;
+    for(const t of pts){await seekTo(v,t);const c=drawThumb(v,v.videoWidth,v.videoHeight),l=lum(c);if(l>bl){bl=l;best=c}if(l>40)break}
+    return {blob:await canvasBlob(best)}}
+  catch{return {}}finally{v.remove();v.removeAttribute('src');v.load()}}
+async function thumbVideo(f){const u=URL.createObjectURL(f);try{return await thumbVideoUrl(u)}finally{URL.revokeObjectURL(u)}}
 async function thumbPdf(f){await loadPdfJs();const doc=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
   let title=null;try{const m=await doc.getMetadata();title=(m.info&&m.info.Title||'').trim()}catch{}
   const p=await doc.getPage(1),vp=p.getViewport({scale:1}),sc=420/vp.width,v2=p.getViewport({scale:sc}),c=document.createElement('canvas');
@@ -262,12 +313,12 @@ async function thumbPdf(f){await loadPdfJs();const doc=await pdfjsLib.getDocumen
   const n=doc.numPages;doc.destroy();return {blob:await canvasBlob(c),title:title&&title.length>2?title:null,pages:n}}
 
 /* ---------- tambah file ---------- */
-async function addFiles(list){const files=[...list];let i=0,fail=0;
+async function addFiles(list,cat,hf){const files=[...list];let i=0,fail=0;if(cat)await addCat(cat,hf);
   for(const f of files){i++;const k=kind(f);if(!k){fail++;continue}
     try{toast(`Mengunci ${i}/${files.length}…`,60000);$('#bar').style.transform=`scaleX(${(i-1)/files.length})`;
       const id=uid(),t=k==='image'?await thumbImage(f):k==='video'?await thumbVideo(f):isZip(f)?await thumbZip(f):await thumbPdf(f);
       const chunks=[];for(let o=0;o<f.size;o+=CH)chunks.push(await seal(await f.slice(o,o+CH).arrayBuffer()));
-      const meta={title:t.title||clean(f.name),type:k,mime:(k==='pdf'&&isZip(f))?'application/zip':(f.type||'application/pdf'),size:f.size,added:Date.now(),pages:t.pages||0};
+      const meta={title:t.title||clean(f.name),type:k,cat:cat||'',hid:!!hf,mime:(k==='pdf'&&isZip(f))?'application/zip':(f.type||'application/pdf'),size:f.size,added:Date.now(),pages:t.pages||0};
       await put('data',{id,chunks});
       await put('meta',{id,m:await sealJSON(meta),th:t.blob?await seal(await t.blob.arrayBuffer()):null});
     }catch(e){fail++;console.error(e)}}
@@ -276,20 +327,60 @@ async function addFiles(list){const files=[...list];let i=0,fail=0;
 
 /* ---------- daftar ---------- */
 let prog={},stag=false;
+const vis=()=>items.filter(x=>!!x.hid===hm), catKey=h=>h?'h':'n';
+async function saveCats(){await put('cfg',{k:'cats',v:await sealJSON(CATS)})}
+async function addCat(c,h=hm){const L=CATS[catKey(h)];if(c&&!L.includes(c)){L.push(c);await saveCats()}}
+async function patchMeta(id,fn){const r=await get('meta',id),m=await unsealJSON(r.m);fn(m);r.m=await sealJSON(m);await put('meta',r);const it=items.find(x=>x.id===id);if(it)Object.assign(it,m)}
 async function load(){urls.forEach(URL.revokeObjectURL);urls=[];const rows=await all('meta');items=[];prog={};
   for(const r of rows){try{const m=await unsealJSON(r.m);let th=null;if(r.th){th=URL.createObjectURL(new Blob([await unseal(r.th)],{type:'image/jpeg'}));urls.push(th)}items.push({id:r.id,...m,th})}catch{}}
   for(const r of await all('cfg')){if(r.k.startsWith('prog:')){try{prog[r.k.slice(5)]=await unsealJSON(r.v)}catch{}}}
+  CATS={n:[],h:[]};const cr=await get('cfg','cats');if(cr){try{const o=await unsealJSON(cr.v);CATS.n=o.n||[];CATS.h=o.h||[]}catch{}}
+  let ch=0;items.forEach(x=>{const L=CATS[catKey(x.hid)];if(x.cat&&!L.includes(x.cat)){L.push(x.cat);ch=1}});if(ch)await saveCats();
   items.sort((a,b)=>b.added-a.added);stag=true;render()}
-const ICON={image:'▣',video:'▶',pdf:'❏'}, TAG={image:'foto',video:'video',pdf:'komik'};
-function render(dx){const g=$('#grid'),list=items.filter(x=>tab==='all'||x.type===tab);g.textContent='';g.className='grid';
-  $('#empty').classList.toggle('hide',list.length>0);$('#cnt').textContent=items.length?items.length+' item':'';
-  const fr=document.createDocumentFragment();
-  list.forEach((it,i)=>{const c=document.createElement('div');c.className='cell';if(stag&&S.anim&&i<14){c.classList.add('in');c.style.setProperty('--i',i)}
-    const b=document.createElement('button'),pg=prog[it.id],done=pg&&pg.p>=pg.n,fresh=!pg&&Date.now()-it.added<6048e5;b.className='card';
-    b.innerHTML=(it.th?'<img alt="" decoding="async" loading="lazy">':`<div class="ph">${ICON[it.type]}</div>`)+`<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`+
-      (done?'<span class="bd dn">selesai</span>':fresh?'<span class="bd">baru</span>':'')+(pg&&!done?`<span class="pr" style="width:${Math.round(pg.p/pg.n*100)}%"></span>`:'');
-    b.querySelector('em').textContent=it.title;const im=b.querySelector('img');if(im){im.onload=()=>im.classList.add('ld');im.src=it.th}
-    cardEls[it.id]=b;b.onclick=()=>{hap(8);openItem(it,b)};c.appendChild(b);fr.appendChild(c)});
+const ICON={image:'▣',video:'▶',pdf:'❏'}, TAG={image:'foto',video:'video',pdf:'komik'}, TNAME={image:'Foto',video:'Video',pdf:'Komik'}, TORD=['image','video','pdf'];
+
+/* pilih banyak: tahan lama pada kartu */
+function toggleSel(id,force){if(!sel)sel=new Set();const on=force!==undefined?force:!sel.has(id);on?sel.add(id):sel.delete(id);const b=cardEls[id];b&&b.classList.toggle('sel',on);
+  if(!sel.size)return endSel();document.body.classList.add('sm');$('#selbar').classList.remove('hide');updSel()}
+function updSel(){$('#selc').textContent=sel?sel.size:'';$('#selh').textContent=hm?'Keluarkan':'Sembunyikan'}
+function endSel(){sel=null;document.body.classList.remove('sm');$('#selbar').classList.add('hide');Object.values(cardEls).forEach(b=>b.classList.remove('sel'))}
+function bindCard(b,it){let t=null,sx=0,sy=0,lp=false;const cancel=()=>{clearTimeout(t);t=null};
+  b.addEventListener('pointerdown',e=>{lp=false;sx=e.clientX;sy=e.clientY;cancel();t=setTimeout(()=>{t=null;lp=true;hap(20);toggleSel(it.id,true)},480)});
+  b.addEventListener('pointermove',e=>{if(t&&(Math.abs(e.clientX-sx)>9||Math.abs(e.clientY-sy)>9))cancel()});
+  ['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,cancel));
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+  b.onclick=()=>{if(lp){lp=false;return}if(sel){hap(6);toggleSel(it.id);return}hap(8);openItem(it,b)}}
+function mkCell(it,i){const c=document.createElement('div');c.className='cell';if(stag&&S.anim&&i<14){c.classList.add('in');c.style.setProperty('--i',i)}
+  const b=document.createElement('button'),pg=prog[it.id],done=pg&&pg.p>=pg.n,fresh=!pg&&Date.now()-it.added<6048e5;b.className='card'+(sel&&sel.has(it.id)?' sel':'');
+  b.innerHTML=(it.th?'<img alt="" decoding="async" loading="lazy">':`<div class="ph">${ICON[it.type]}</div>`)+`<div class="cap"><em></em><i>${TAG[it.type]}${it.pages?' · '+it.pages+' hlm':''}</i></div>`+
+    (done?'<span class="bd dn">selesai</span>':fresh?'<span class="bd">baru</span>':'')+(pg&&!done?`<span class="pr" style="width:${Math.round(pg.p/pg.n*100)}%"></span>`:'')+'<span class="ck">✓</span>';
+  b.querySelector('em').textContent=it.title;const im=b.querySelector('img');if(im){im.onload=()=>im.classList.add('ld');im.src=it.th}
+  cardEls[it.id]=b;bindCard(b,it);c.appendChild(b);return c}
+function render(dx){const g=$('#grid'),v0=vis(),tl=v0.filter(x=>tab==='all'||x.type===tab),L=CATS[catKey(hm)],has=new Set(v0.map(x=>x.cat||''));
+  if(catF!==null&&!has.has(catF))catF=null;
+  const list=catF===null?tl:tl.filter(x=>(x.cat||'')===catF),cs=L.filter(c=>has.has(c));
+  g.textContent='';g.className='';shown=[];let ix=0;
+  $('#cnt').textContent=v0.length?v0.length+' item':'';
+  const em=$('#empty');em.classList.toggle('hide',list.length>0);
+  em.innerHTML=v0.length?'<b>Tidak ada di sini</b>Coba ganti tab atau kategori.':hm?'<b>Folder kosong</b>Tekan + untuk menambah, atau pindahkan item lewat tombol Edit.':'<b>Masih kosong</b>Tekan + untuk menambah foto, video, atau PDF komik.';
+  const chs=$('#chips');chs.classList.toggle('hide',!cs.length);
+  if(cs.length){const cnt=c=>tl.filter(x=>(x.cat||'')===c).length;
+    chs.innerHTML=`<button data-k="all" class="${catF===null?'on':''}">Semua<small>${tl.length}</small></button>`+cs.map(c=>`<button data-c="${esc(c)}" class="${catF===c?'on':''}">${esc(c)}<small>${cnt(c)}</small></button>`).join('')+
+      (has.has('')?`<button data-k="none" class="${catF===''?'on':''}">Tanpa kategori<small>${cnt('')}</small></button>`:'')+'<button data-m="1">⋯</button>'}
+  const mk=a=>{const gr=document.createElement('div');gr.className='grid';a.forEach(it=>{shown.push(it);gr.appendChild(mkCell(it,ix++))});return gr};
+  const typed=(a,p)=>{const ts=TORD.filter(t=>a.some(x=>x.type===t));
+    if(tab==='all'&&ts.length>1)ts.forEach(t=>{const b=a.filter(x=>x.type===t),h=document.createElement('div');h.className='sub';h.textContent=TNAME[t]+' · '+b.length;p.appendChild(h);p.appendChild(mk(b))});
+    else p.appendChild(mk(a))};
+  const fr=document.createDocumentFragment(),groups=[];
+  if(S.grp==='cat'){cs.forEach(c=>{const a=list.filter(x=>x.cat===c);if(a.length)groups.push([c,a])});const o=list.filter(x=>!x.cat);if(o.length)groups.push(['',o])}
+  if(S.grp!=='cat')fr.appendChild(mk(list));
+  else if(groups.length===1&&groups[0][0]==='')typed(list,fr);
+  else groups.forEach(([c,a])=>{const sc=document.createElement('section');sc.className='sec'+(collapsed.has(c)?' cl':'');
+    const h=document.createElement('button');h.className='sh';h.innerHTML='<span class="ch">▾</span><b></b><small></small>';
+    h.children[1].textContent=c||'Tanpa kategori';
+    h.children[2].textContent=tab==='all'?TORD.map(t=>[t,a.filter(x=>x.type===t).length]).filter(x=>x[1]).map(x=>x[1]+' '+TAG[x[0]]).join(' · '):a.length+' item';
+    h.onclick=()=>{hap(6);sc.classList.toggle('cl');sc.classList.contains('cl')?collapsed.add(c):collapsed.delete(c)};
+    sc.appendChild(h);typed(a,sc);fr.appendChild(sc)});
   g.appendChild(fr);stag=false;
   if(dx&&S.anim){g.style.setProperty('--dx',dx*30+'px');void g.offsetWidth;g.classList.add('sl')}}
 
@@ -320,7 +411,7 @@ function hideChrome(){clearTimeout(hideT);$('#view').classList.add('hid')}
 const clipFor=r=>`inset(${r.top}px ${innerWidth-r.right}px ${innerHeight-r.bottom}px ${r.left}px round 16px)`;
 function cleanup(){clearTimeout(V.tm);clearTimeout(pt);if(flushProg){flushProg();flushProg=null}const b=$('#vbody');b.onscroll=null;b.textContent='';
   if(io){io.disconnect();io=null}if(pdfDoc){pdfDoc.destroy();pdfDoc=null}zipU8=zipEnts=rd=null;if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null}}
-const mediaList=it=>{let l=items.filter(x=>x.type!=='pdf'&&(tab==='all'||tab==='pdf'||x.type===tab));return l.some(x=>x.id===it.id)?l:items.filter(x=>x.type!=='pdf')};
+const mediaList=it=>{const l=shown.filter(x=>x.type!=='pdf');return l.some(x=>x.id===it.id)?l:vis().filter(x=>x.type!=='pdf')};
 function step(d){const l=V.list;if(l.length<2||!cur)return;hap(6);openItem(l[(l.findIndex(x=>x.id===cur.id)+d+l.length)%l.length],null,d)}
 function slideTick(){clearTimeout(V.tm);if(V.slide&&cur&&cur.type==='image')V.tm=setTimeout(()=>step(1),S.ssd*1000)}
 
@@ -363,8 +454,8 @@ function startReader(body,N,ratio,painter){const wrap=document.createElement('di
   if(pr&&pr.p>1&&pr.p<pr.n)requestAnimationFrame(()=>{c[pr.p-1]&&c[pr.p-1].scrollIntoView();pos.textContent=pr.p+' / '+N})}
 const rcard=it=>{const b=document.createElement('button');b.className='rc';b.innerHTML=(it.th?`<img alt="" src="${it.th}">`:`<div class="ph">${ICON[it.type]}</div>`)+'<span></span>';b.lastChild.textContent=(it.type==='video'?'▶ ':'')+it.title;b.onclick=()=>{hap(8);openItem(it)};return b};
 function endPanel(){const nat=(a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true}),key=t=>t.replace(/[\s_\-.]*(?:chapter|ch|volume|vol|bab|episode|ep|#)?[\s.]*\d+.*$/i,'').trim().toLowerCase(),
-    cs=items.filter(x=>x.type==='pdf'&&x.id!==cur.id),k=key(cur.title),nx=k?cs.filter(x=>key(x.title)===k&&nat(x,cur)>0).sort(nat):[],
-    rd1=[...new Set([...nx,...cs.filter(x=>prog[x.id]&&prog[x.id].p<prog[x.id].n),...sh(cs.filter(x=>!prog[x.id]))])].slice(0,10),vids=sh(items.filter(x=>x.type==='video')).slice(0,10);
+    cs=vis().filter(x=>x.type==='pdf'&&x.id!==cur.id),k=key(cur.title),nx=k?cs.filter(x=>key(x.title)===k&&nat(x,cur)>0).sort(nat):[],
+    rd1=[...new Set([...nx,...cs.filter(x=>prog[x.id]&&prog[x.id].p<prog[x.id].n),...sh(cs.filter(x=>!prog[x.id]))])].slice(0,10),vids=sh(vis().filter(x=>x.type==='video')).slice(0,10);
   const d=document.createElement('div');d.id='endp';d.innerHTML='<h2>Selesai</h2><p></p><button class="eb" id="e1">Baca lagi</button><button class="eb" id="e2">Tutup</button>'+(rd1.length?'<h4>Lanjut baca</h4><div class="rrow" id="rr"></div>':'')+(vids.length?'<h4>Tonton selanjutnya</h4><div class="rrow" id="rv"></div>':'');
   d.querySelector('p').textContent=cur.title;rd1.forEach(x=>d.querySelector('#rr').appendChild(rcard(x)));vids.forEach(x=>d.querySelector('#rv').appendChild(rcard(x)));
   d.querySelector('#e1').onclick=()=>{hap(8);$('#vbody').scrollTo({top:0,behavior:'smooth'})};d.querySelector('#e2').onclick=()=>closeView();return d}
@@ -397,13 +488,93 @@ $('#vs').onclick=()=>{V.slide=!V.slide;hap(8);$('#vs').textContent=V.slide?'Jeda
 $('#vd').onclick=async()=>{if(!cur||!confirm('Hapus "'+cur.title+'" selamanya?'))return;const id=cur.id,med=cur.type!=='pdf',l=V.list,i=l.findIndex(x=>x.id===id);hap([20,30,20]);
   await del('meta',id);await del('data',id);try{await del('cfg','prog:'+id)}catch{}delete prog[id];items=items.filter(x=>x.id!==id);V.list=l.filter(x=>x.id!==id);
   if(med&&V.list.length)openItem(V.list[Math.min(i,V.list.length-1)],null,1);else closeView();render();toast('Dihapus')};
-$('#vr').onclick=async()=>{if(!cur)return;const t=prompt('Judul baru',cur.title);if(!t||!t.trim())return;const r=await get('meta',cur.id),m=await unsealJSON(r.m);m.title=t.trim();r.m=await sealJSON(m);await put('meta',r);cur.title=m.title;$('#vt').textContent=m.title;render()};
+$('#vr').onclick=()=>{hap(6);editSheet()};
+
+/* ---------- kategori, edit thumbnail, folder tersembunyi ---------- */
+function catSheet(title,curC,cb){const L=CATS[catKey(hm)];
+  sheet(`<h3>${esc(title)}</h3><div class="seg">${['',...L].map(c=>`<button data-c="${esc(c)}" class="${c===curC?'on':''}">${c?esc(c):'Tanpa kategori'}</button>`).join('')}<button data-new="1">+ Baru</button></div>`,
+    pn=>pn.onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(8);let c;if(b.dataset.new){c=(prompt('Nama kategori baru')||'').trim();if(!c)return}else c=b.dataset.c;closeSheet();cb(c)})}
+function askAddCat(l){const h=hm;catSheet('Masukkan '+l.length+' file ke kategori',typeof catF==='string'?catF:'',c=>addFiles(l,c,h))}
+function manageCats(){const L=CATS[catKey(hm)],cnt=c=>items.filter(x=>!!x.hid===hm&&(x.cat||'')===c).length,mine=c=>items.filter(x=>!!x.hid===hm&&x.cat===c);
+  sheet(`<h3>Kategori${hm?' (tersembunyi)':''}</h3>`+(L.length?L.map((c,i)=>`<div class="row crow"><span>${esc(c)} <small>${cnt(c)}</small></span><span><button data-a="up" data-i="${i}">▲</button><button data-a="rn" data-i="${i}">Ubah</button><button data-a="dl" data-i="${i}" class="dg">Hapus</button></span></div>`).join(''):'<small>Belum ada kategori.</small>')+'<button class="big" data-a="new">+ Kategori baru</button>',
+  pn=>{pn.onclick=async e=>{const b=e.target.closest('button');if(!b)return;hap(6);const a=b.dataset.a,i=+b.dataset.i,c=L[i];
+    if(a==='new'){const n=(prompt('Nama kategori baru')||'').trim();if(n){await addCat(n);manageCats()}}
+    else if(a==='up'){if(i>0){const t=L[i-1];L[i-1]=L[i];L[i]=t;await saveCats();manageCats();render()}}
+    else if(a==='rn'){const n=(prompt('Nama baru',c)||'').trim();if(!n||n===c||L.includes(n))return;for(const it of mine(c))await patchMeta(it.id,m=>{m.cat=n});L[i]=n;await saveCats();manageCats();render()}
+    else if(a==='dl'){if(!confirm('Hapus kategori "'+c+'"? Isinya jadi tanpa kategori.'))return;for(const it of mine(c))await patchMeta(it.id,m=>{m.cat=''});L.splice(i,1);await saveCats();manageCats();render()}}})}
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;hap(6);if(b.dataset.m)return manageCats();catF=b.dataset.k==='all'?null:b.dataset.k==='none'?'':b.dataset.c;render()};
+$('#selbar').onclick=async e=>{const b=e.target.closest('button');if(!b||!sel)return;hap(8);const ids=[...sel],a=b.dataset.a;
+  if(a==='x')endSel();
+  else if(a==='all'){shown.forEach(x=>{sel.add(x.id);const c=cardEls[x.id];c&&c.classList.add('sel')});updSel()}
+  else if(a==='cat')catSheet(ids.length+' item ke kategori','',async c=>{toast('Memindahkan…',60000);await addCat(c);for(const id of ids)await patchMeta(id,m=>{m.cat=c});endSel();render();toast('Selesai')});
+  else if(a==='hid'){const to=!hm;toast('Memindahkan…',60000);for(const id of ids){const it=items.find(x=>x.id===id);if(it&&it.cat)await addCat(it.cat,to);await patchMeta(id,m=>{m.hid=to})}endSel();render();toast(to?'Dipindah ke folder tersembunyi':'Dikeluarkan dari folder tersembunyi',2800)}
+  else if(a==='del'){if(!confirm('Hapus '+ids.length+' item selamanya?'))return;for(const id of ids){await del('meta',id);await del('data',id);try{await del('cfg','prog:'+id)}catch{}delete prog[id]}
+    items=items.filter(x=>!ids.includes(x.id));endSel();render();toast('Dihapus')}};
+
+/* edit item: judul, kategori, thumbnail, folder */
+async function setThumb(blob){const it=cur;if(!it)return;const r=await get('meta',it.id);r.th=await seal(await blob.arrayBuffer());await put('meta',r);
+  const u=URL.createObjectURL(blob);if(it.th)URL.revokeObjectURL(it.th);it.th=u;urls.push(u);$('#vblur').style.backgroundImage=`url(${u})`;render();toast('Thumbnail diganti')}
+async function pageThumb(n){if(pdfDoc){const p=await pdfDoc.getPage(n),vp=p.getViewport({scale:1}),v2=p.getViewport({scale:420/vp.width}),c=document.createElement('canvas');c.width=v2.width;c.height=v2.height;
+    await p.render({canvasContext:c.getContext('2d'),viewport:v2}).promise;return canvasBlob(c)}
+  const en=zipEnts[n-1],u=await zipData(zipU8,en),bm=await createImageBitmap(new Blob([u],{type:mimeOf(en.name)})),c=drawThumb(bm,bm.width,bm.height);bm.close();return canvasBlob(c)}
+function framePicker(){if(!curUrl)return toast('Video belum siap');const src=curUrl;
+  sheet('<h3>Geser untuk memilih frame</h3><video id="fv" playsinline muted preload="auto" style="width:100%;max-height:42vh;border-radius:12px;background:#000;display:block"></video><input id="fr" type="range" min="0" max="1000" value="0" style="width:100%;margin:16px 0 4px"><div class="row"><span id="ft">0:00</span><small>Geser sampai gambarnya bagus</small></div><button class="big ctr" id="fu">Pakai frame ini</button>',pn=>{
+    const v=pn.querySelector('#fv'),r=pn.querySelector('#fr'),ft=pn.querySelector('#ft'),mm=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+    v.src=src;v.onloadedmetadata=()=>{const t=Math.min(1,(v.duration||2)/10);v.currentTime=t;r.value=Math.round(t/v.duration*1000)};
+    r.oninput=()=>{if(v.duration)v.currentTime=r.value/1000*v.duration};v.onseeked=()=>{ft.textContent=mm(v.currentTime)};
+    pn.querySelector('#fu').onclick=async()=>{if(!v.videoWidth)return toast('Video belum siap');const b=await canvasBlob(drawThumb(v,v.videoWidth,v.videoHeight));closeSheet();await setThumb(b)}})}
+function pagePicker(){const N=pdfDoc?pdfDoc.numPages:zipEnts?zipEnts.length:0;if(!N)return toast('Tunggu komik selesai dimuat');const now=parseInt($('#pos').textContent)||1;
+  sheet(`<h3>Halaman untuk sampul (1 - ${N})</h3><input id="pn" type="number" min="1" max="${N}" value="${now}" class="pin" style="letter-spacing:0"><button class="big ctr" id="pu">Pakai halaman ini</button>`,pn=>{
+    pn.querySelector('#pu').onclick=async()=>{const n=Math.min(N,Math.max(1,+pn.querySelector('#pn').value||1));closeSheet();toast('Membuat sampul…',60000);try{await setThumb(await pageThumb(n))}catch(e){console.error(e);toast('Gagal membuat sampul',3000)}}})}
+function editSheet(){const it=cur;if(!it)return;const pv=$('#vbody video');pv&&pv.pause();
+  const th=it.type==='video'?'<button class="big" data-a="frame">Pilih frame dari video</button><button class="big" data-a="auto">Cari frame yang terang (otomatis)</button>':it.type==='pdf'?'<button class="big" data-a="page">Pakai halaman lain sebagai sampul</button>':'<button class="big" data-a="auto">Buat ulang thumbnail</button>';
+  sheet(`<h3>Judul</h3><button class="big" data-a="title"></button><h3>Kategori</h3><button class="big" data-a="cat"></button><h3>Thumbnail</h3>${th}<button class="big" data-a="file">Pilih gambar dari perangkat</button><h3>Folder</h3><button class="big" data-a="hid">${it.hid?'Keluarkan dari folder tersembunyi':'Pindahkan ke folder tersembunyi'}</button>`,pn=>{
+    pn.querySelector('[data-a=title]').textContent=it.title;pn.querySelector('[data-a=cat]').textContent=it.cat||'Tanpa kategori';
+    pn.onclick=async e=>{const b=e.target.closest('button');if(!b||!cur)return;const a=b.dataset.a;hap(6);
+      if(a==='title'){const t=prompt('Judul baru',it.title);if(!t||!t.trim())return;await patchMeta(it.id,m=>{m.title=t.trim()});$('#vt').textContent=it.title;render();closeSheet()}
+      else if(a==='cat')catSheet('Kategori',it.cat||'',async c=>{await addCat(c,it.hid);await patchMeta(it.id,m=>{m.cat=c});render();toast(c?'Kategori: '+c:'Tanpa kategori')});
+      else if(a==='frame')framePicker();
+      else if(a==='page'){closeSheet();pagePicker()}
+      else if(a==='auto'){closeSheet();toast('Membuat thumbnail…',60000);let t={};
+        if(it.type==='video'&&curUrl)t=await thumbVideoUrl(curUrl);else{const im=$('#stage img');if(im&&im.naturalWidth)t={blob:await canvasBlob(drawThumb(im,im.naturalWidth,im.naturalHeight))}}
+        t.blob?await setThumb(t.blob):toast('Gagal membuat thumbnail',3000)}
+      else if(a==='file'){closeSheet();picking=Date.now();$('#cfile').click()}
+      else if(a==='hid'){const to=!it.hid;if(it.cat)await addCat(it.cat,to);await patchMeta(it.id,m=>{m.hid=to});closeSheet();closeView(0,1);toast(to?'Dipindah ke folder tersembunyi':'Dikeluarkan dari folder tersembunyi',2800)}}})}
+$('#cfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';picking=0;if(!f||!cur)return;toast('Membuat thumbnail…',60000);const t=await thumbImage(f);t.blob?await setThumb(t.blob):toast('Gagal membaca gambar',3000)};
+
+/* perbaiki thumbnail hitam (semua video sekaligus) */
+const isDark=u=>new Promise(r=>{const im=new Image();im.onload=()=>r(lum(im)<28);im.onerror=()=>r(true);im.src=u});
+async function fixDark(){const vs=items.filter(x=>x.type==='video');if(!vs.length)return toast('Belum ada video');let n=0,i=0;
+  try{for(const it of vs){i++;toast(`Memeriksa ${i}/${vs.length}…`,60000);$('#bar').style.transform=`scaleX(${(i-1)/vs.length})`;
+      if(it.th&&!(await isDark(it.th)))continue;
+      const u=URL.createObjectURL(new Blob(await readAll(it.id),{type:it.mime})),t=await thumbVideoUrl(u);URL.revokeObjectURL(u);
+      if(t.blob){const r=await get('meta',it.id);r.th=await seal(await t.blob.arrayBuffer());await put('meta',r);n++}}}
+  catch(e){console.error(e)}
+  $('#bar').style.transform='scaleX(1)';setTimeout(()=>$('#bar').style.transform='scaleX(0)',400);await load();toast(n?n+' thumbnail diperbaiki':'Tidak ada thumbnail yang hitam',3200)}
+
+/* folder tersembunyi: PIN kedua, tidak muncul di tab/kategori biasa */
+const pinHash=async(p,sl)=>{const m=await crypto.subtle.importKey('raw',te.encode(p),'PBKDF2',false,['deriveBits']);return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:sl,iterations:150000,hash:'SHA-256'},m,256))};
+function askPin(msg,two){return new Promise(res=>{sheet(`<h3>${msg}</h3><input id="pi" class="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN">${two?'<input id="pj" class="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Ulangi PIN">':''}<button class="big ctr" id="po">OK</button>`,pn=>{
+  const a=pn.querySelector('#pi'),b=pn.querySelector('#pj'),go=()=>{const v=a.value;if(v.length<4)return toast('Minimal 4 karakter');if(b&&b.value!==v)return toast('PIN tidak sama');closeSheet();res(v)};
+  pn.querySelector('#po').onclick=go;pn.onkeydown=e=>{if(e.key==='Enter')go()};a.focus()})})}
+async function openHidden(){const r=await get('cfg','hpin');
+  if(!r){const p=await askPin('Buat PIN folder tersembunyi',true);if(!p)return;const sl=crypto.getRandomValues(new Uint8Array(16));await put('cfg',{k:'hpin',v:await sealJSON({s:[...sl],h:[...await pinHash(p,sl)]})})}
+  else{const p=await askPin('PIN folder tersembunyi');if(!p)return;let o;try{o=await unsealJSON(r.v)}catch{return toast('Gagal membuka',3000)}
+    if(!eq(await pinHash(p,new Uint8Array(o.s)),new Uint8Array(o.h))){hap([30,40,30]);return toast('PIN salah')}}
+  enterHidden()}
+function enterHidden(){hm=true;catF=null;sel&&endSel();collapsed.clear();document.body.classList.add('hm');$('#hbk').classList.remove('hide');$('#ttl').textContent='Tersembunyi';hap(14);render()}
+function exitHidden(){if(!hm)return;closeSheet();endSel();hm=false;catF=null;collapsed.clear();document.body.classList.remove('hm');$('#hbk').classList.add('hide');$('#ttl').textContent='Koleksi';closeView(0,1);render()}
+async function resetPin(){const pw=prompt('Kata sandi utama untuk reset PIN:');if(!pw)return;
+  try{const a=await get('cfg','auth'),k=await derive(pw,new Uint8Array(a.salt));await unseal(a.check,k)}catch{return toast('Kata sandi salah',3000)}
+  await del('cfg','hpin');toast('PIN dihapus. Buat PIN baru saat membuka folder tersembunyi.',4000)}
+$('#hbk').onclick=()=>{hap(8);exitHidden()};
+let ttp=0,ttT;$('#ttl').onclick=()=>{ttp++;clearTimeout(ttT);ttT=setTimeout(()=>ttp=0,1100);if(ttp>=4){ttp=0;if(!hm)openHidden()}};
 
 /* ---------- tab, tambah ---------- */
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const o=[...$('#tabs').children],n=o.indexOf(b),p=o.findIndex(x=>x.classList.contains('on'));if(n===p)return;hap(6);tab=b.dataset.t;o.forEach(x=>x.classList.toggle('on',x===b));render(n>p?1:-1)};
 $('#add').onclick=()=>{hap(10);S.fab==='menu'?sheetAdd():pick('image/*,video/*,application/pdf,.pdf,.zip,.cbz,application/zip')};
 $('#setbtn').onclick=()=>{hap(8);openSettings()};
-$('#file').onchange=e=>{const l=[...e.target.files];e.target.value='';if(l.length)addFiles(l)};
+$('#file').onchange=e=>{const l=[...e.target.files];e.target.value='';picking=0;if(l.length)askAddCat(l)};
 
 /* ---------- kunci / buka ---------- */
 let taps=0,tapT;
@@ -418,10 +589,10 @@ $('#lf').onsubmit=async e=>{e.preventDefault();const pw=$('#pw').value;if(pw.len
     else{const k=await derive(pw,new Uint8Array(auth.salt));KEY=k;try{await unseal(auth.check)}catch{KEY=null;$('#lmsg').textContent='Salah';$('#pw').classList.remove('shake');void $('#pw').offsetWidth;$('#pw').classList.add('shake');hap([30,40,30]);$('#pw').value='';return}}
     $('#pw').value=$('#pw2').value='';$('#lock').classList.add('hide');$('#app').classList.remove('hide');await load()}
   finally{$('#lgo').disabled=false}};
-function lockNow(){KEY=null;items=[];closeSheet();urls.forEach(URL.revokeObjectURL);urls=[];closeView(0,1);$('#grid').textContent='';$('#app').classList.add('hide');
+function lockNow(){KEY=null;items=[];hm=false;catF=null;sel=null;CATS={n:[],h:[]};collapsed.clear();document.body.classList.remove('hm','sm');$('#selbar').classList.add('hide');$('#hbk').classList.add('hide');$('#ttl').textContent='Koleksi';$('#chips').textContent='';closeSheet();urls.forEach(URL.revokeObjectURL);urls=[];closeView(0,1);$('#grid').textContent='';$('#app').classList.add('hide');
   $('#lf').classList.add('hide');$('#nf').classList.remove('hide');$('#lock').classList.remove('hide');taps=0}
 function lock(a){KEY=null;if(a&&S.anim&&!$('#app').classList.contains('hide')){$('#app').classList.add('closing');setTimeout(()=>{lockNow();$('#app').classList.remove('closing')},260)}else lockNow()}
 $('#lockbtn').onclick=()=>{hap(12);lock(true)};
-document.addEventListener('visibilitychange',()=>{if(document.hidden){hideTimer=setTimeout(()=>KEY&&lock(),30000)}else clearTimeout(hideTimer)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(hm&&Date.now()-picking>120000)exitHidden();hideTimer=setTimeout(()=>KEY&&lock(),30000)}else clearTimeout(hideTimer)});
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
